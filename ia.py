@@ -4,7 +4,9 @@ import random
 #! Definir a dimensão do tabuleiro
 Tab_Dimensao = 6
 posicao_BVM = [5, 5]  # Posição inicial do Bolor Verde Móvel (BVM)
-
+##----------
+posicao_Torradeira = [random.randint(0, Tab_Dimensao-1), random.randint(0, Tab_Dimensao-1)]  # Posição aleatória da Torradeira
+#-----------
 #tab = [posicao_HT[0]][posicao_HT[0]] 
 
 #! Começa por criar a matriz de 6x6, vazia que vai representar o tabuleiro
@@ -13,7 +15,7 @@ tab = [[' ' for _ in range(Tab_Dimensao)] for _ in range(Tab_Dimensao)]
 #tab(0, 0)
    # Coloca os elementos no tabuleiro
    
-
+tab[posicao_Torradeira[0]][posicao_Torradeira[1]] = 'T'
 #prioridades = ['N', 'S', 'E', 'O']
     
 #! Definir a posição do homen tosta, no momento inicial
