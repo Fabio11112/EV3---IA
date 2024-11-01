@@ -1,4 +1,7 @@
 import random
+from colourSensor import detectar_cor
+from cores import detectar_cor_por_intervalo 
+from colourSensor import detectar_cor
 
 
 #! Definir a dimensão do tabuleiro
@@ -28,11 +31,10 @@ def imprime_tabuleiro():
     print("\n")
 
 
-
-
 def mov_HT(posicao_HT):
     #!Introduçao com movimento simpleficado
     mov = {'N': (-1, 0), 'S': (1, 0), 'E': (0, 1), 'O': (0, -1)}
+
     newPositionChosen = False
 
     while  not newPositionChosen:
@@ -46,3 +48,5 @@ def mov_HT(posicao_HT):
     print("O homem tosta moveu-se para: ")
     print(escolha)
     return [posicao_HT, escolha] #! retorna a nova posição do EV3
+
+

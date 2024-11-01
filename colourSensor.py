@@ -10,7 +10,5 @@ def detectar_cor():
     cor_nome = sensor_de_cor.color()
     # Também é possível ler a intensidade da luz refletida
     intensidade_luz_refletida = sensor_de_cor.reflection()
-
-
     
     return (cor_detectada, cor_nome)
