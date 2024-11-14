@@ -11,12 +11,7 @@ def sensorUltrasonic(ev3):
         #! Obtenha a distância em cm
     distance = ultrasonic_sensor.distance()
     return distance
-
         #! Amostra a distancia
         #ev3.screen.print("{} cm", distance)
         #! Apos 5 segundos repete a verificaçao
         #wait(500)
-
-
-
-

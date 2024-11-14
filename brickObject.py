@@ -3,17 +3,28 @@ from ia import mov_HT
 from colourSensor import detectar_cor
 from cores import detectar_cor_por_intervalo 
 from colourSensor import detectar_cor
-from movement import turn
+from gyroscope import turn
 from pybricks.tools import wait
+from verificaObstrucao import detetaBarreira
+from gyroscope import reset_angle, adjust_angle 
+from pybricks.ev3devices import GyroSensor
+from pybricks.parameters import Port, Direction
+
+directions = ['N', 'E', 'S', 'O']
+gyro_sensor = GyroSensor(Port.S4, Direction.COUNTERCLOCKWISE)
+gyro_sensor.reset_angle(90)
+
+print("Angulo acumulado inicio: ", gyro_sensor.angle())
 
 class HomemTosta:
     
-    def __init__(self):
+    def __init__(self, ev3):
         self.coordinates = [0,0]
         self.direction = 'N'
         self.vitoria = False
         self.morto = False
         self.distanciaBolor = 3
+        self.ev3 = ev3
         
 
     def verificaBolor(self, ev3):
@@ -37,11 +48,13 @@ class HomemTosta:
     def getDirection(self):
         return self.direction
 
-    def move(self):
-        moveDecision = mov_HT(self.coordinates)
+    def move(self, barreiras):
+        print("A mover")
+        moveDecision = mov_HT(self.coordinates, barreiras)
+        print(moveDecision)
         
-        if not moveDecision:
-            return moveDecision #falso
+        # if not moveDecision:
+        #     return moveDecision #falso
 
         if moveDecision[1] == 'N':
             self.goNorth()
@@ -57,65 +70,81 @@ class HomemTosta:
         
 
     def goNorth(self):
+        print("Angulo acumulado em goNorth: ", gyro_sensor.angle())
+        angle = 90
         if self.direction == 'N':
-            self.goForward()
+            self.goForward(angle)
         elif self.direction == 'S':
-            self.goBackwards()
+            self.goBackwards(angle)
         elif self.direction == 'E':
-            self.goLeft()
+            self.goLeft(angle)
         elif self.direction == 'O':
-            self.goRight()
+            self.goRight(angle)
 
         self.direction = 'N'
         
     def goSouth(self):
+        print("Angulo acumulado em goSouth: ", gyro_sensor.angle())
+        angle = -90
         if self.direction == 'N':
-            self.goBackwards()
+            self.goBackwards(angle)
         elif self.direction == 'S':
-            self.goForward()
+            self.goForward(angle)
         elif self.direction == 'E':
-            self.goRight()
+            self.goRight(angle)
         elif self.direction == 'O':
-            self.goLeft()
-
+            self.goLeft(angle)
         self.direction = 'S'
+        
 
     def goEast(self):
+        print("Angulo acumulado em goEast: ", gyro_sensor.angle())
+        angle = 0
         if self.direction == 'N':
-            self.goRight()
+            self.goRight(angle)
         elif self.direction == 'S':
-            self.goLeft()
+            self.goLeft(angle)
         elif self.direction == 'E':
-            self.goForward()
+            self.goForward(angle)
         elif self.direction == 'O':
-            self.goBackwards()
+            self.goBackwards(angle)
 
         self.direction = 'E'
 
+        
+
     def goWest(self):
+        print("Angulo acumulado em goWest: ", gyro_sensor.angle())
+        angle = 180
         if self.direction == 'N':
-            self.goLeft()
+            self.goLeft(angle)
         elif self.direction == 'S':
-            self.goRight()
+            self.goRight(angle)
         elif self.direction == 'E':
-            self.goBackwards()
+            self.goBackwards(angle)
         elif self.direction == 'O':
-            self.goForward()
+            self.goForward(angle)
 
         self.direction == 'O'
 
+        
 
-    def goForward(self):
-        OneBlockForward()
 
-    def goRight(self):
-        OneBlocktoRight()
+    def goForward(self, angle):
+        #adjust_angle(angle, gyro_sensor)
+        OneBlockForward(angle, gyro_sensor)
 
-    def goLeft(self):
-        OneBlocktoLeft()
+    def goRight(self, angle):
+        #adjust_angle(angle, gyro_sensor)
+        OneBlocktoRight(angle, gyro_sensor)
 
-    def goBackwards(self):
-        OneBlockBehind()
+    def goLeft(self, angle):
+        #adjust_angle(angle, gyro_sensor)
+        OneBlocktoLeft(angle, gyro_sensor)
+
+    def goBackwards(self, angle):
+        #adjust_angle(angle, gyro_sensor)
+        OneBlockBehind(angle, gyro_sensor)
 
     def setCoordinates(self, value):
         self.coordinates = value
@@ -135,24 +164,40 @@ class HomemTosta:
   
 
     def analisaCelula(self):
+        count = 0
+        indice = {"N": 0, "E": 1, "S": 2, "O": 3}
+        barreira = [False]*4
+
+        direcaoInicial = indice[self.direction]
+
         dados = [3]*4 #valor default
         valido = False
         for _ in range(4):
-            
+
+            isBarreira = detetaBarreira(self.ev3)
             wait(1000)
             cor = self.verifCor()
+
             while not valido:
                 colors = {'Preto':0, 'Azul':1, 'Vermelho':2, 'Cor Desconhecida':3}
                 if(cor not in colors.keys()):
                     cor = "Cor Desconhecida"
-                
                 self.insereDados(dados, colors[cor])
                 valido = True
+
+            if(isBarreira):
+                print((direcaoInicial + _) % 4)
+                barreira[(direcaoInicial + _) % 4] = True
             turn (-90)
 
-        return self.decodifica(dados)  
+        barreiraDict = {"N": barreira[0], "E": barreira[1], "S": barreira[2], "O": barreira[3]}
+        print(self.direction)
+        print(barreiraDict)
+        return {"dados":self.decodifica(dados), "barreira":barreiraDict}
 
     def decodifica(self, dados):
+
+        print("Superior esquerdo :", )
         bolor = 0
         torradeira = 0
         manteiga = 0
@@ -164,4 +209,4 @@ class HomemTosta:
 
         return {'bolor': bolor, 'torradeira': torradeira, 'manteiga': manteiga}
 
-        
+    #! def ajustaAngulo(self, targetAngle):

@@ -31,17 +31,23 @@ def imprime_tabuleiro():
     print("\n")
 
 
-def mov_HT(posicao_HT):
+def mov_HT(posicao_HT, barreiras):
     #!Introduçao com movimento simpleficado
     mov = {'N': (-1, 0), 'S': (1, 0), 'E': (0, 1), 'O': (0, -1)}
+    print(barreiras)
 
     newPositionChosen = False
 
     while  not newPositionChosen:
+
         escolha = random.choice(list(mov.keys()))
+        print(escolha)
+
+
         nova_pos = [posicao_HT[0] + mov[escolha][0], posicao_HT[1] + mov[escolha][1]]
         #!Verifica que não saia do tabuleiro
-        if 0 <= nova_pos[0] < Tab_Dimensao and 0 <= nova_pos[1] < Tab_Dimensao:
+
+        if 0 <= nova_pos[0] < Tab_Dimensao and 0 <= nova_pos[1] < Tab_Dimensao and not barreiras[escolha]:
             posicao_HT[:] = nova_pos
             newPositionChosen = True
         

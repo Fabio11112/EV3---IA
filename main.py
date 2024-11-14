@@ -11,21 +11,25 @@ from colourSensor import detectar_cor
 from pybricks.parameters import Color
 from cores import detectar_cor_por_intervalo
 from pybricks.parameters import Button
+from gyroscope import reset_angle, adjust_angle
 
 
 ev3 = EV3Brick()
-hm_t = HomemTosta()
+hm_t = HomemTosta(ev3)
+
 
 SEGUNDOS = 5000
 
 #ev3State = {"coordinates": posicao_HT, "direction": 'N'}
 
-
+estava_em_torradeira = False
 #test(ev3)
 def main():
 
     print("está no ciclo\n")
     while True:
+
+        wait_for_button()
 
         cor = detectar_cor()
         rgb = cor[0]
@@ -37,31 +41,54 @@ def main():
         #ev3.screen.print(f"Cor detectada: {cor_detectada}")
         # ev3.screen.print(f"Valores RGB: {rgb}")
 
-        imprime_tabuleiro()
-
+        ev3.screen.print("Começa leitura")
+        print("Começa leitura")
         dadosCelula = hm_t.analisaCelula()
+        ev3.screen.print("Acaba leitura")
+        print("Acaba leitura")
+
+
         print(dadosCelula)
 
+        if(dadosCelula["dados"]['bolor'] == 0):
+            ev3.screen.print("Game Over")
+            print("Game Over")
+            break
+        elif(dadosCelula["dados"]['manteiga'] == 0):
+            ev3.screen.print("Victory")
+            print("Victory")
+            break
+        elif(dadosCelula["dados"]["torradeira"] == 0):
+            if(not estava_em_torradeira):
+                estava_em_torradeira = True
+                continue
+            else:
+                estava_em_torradeira = False
 
-        # # # hm_t.move()
-        # # # hm_t.verificaBolor(ev3)
-        # # # if(hm_t.morto):
-        # # #     print("Game Over")
-        # # #     ev3.screen.print("Game Over")
-        # # #     break
 
 
-        # # # print((hm_t.getCoordinates(),
-        # # # hm_t.getDirection())) 
+        hm_t.move(dadosCelula["barreira"])
+        #hm_t.verificaBolor(ev3)
+        if(hm_t.morto):
+            print("Game Over")
+            ev3.screen.print("Game Over")
+            break
+
+
+        imprime_tabuleiro()
+
+        # # dadosCelula = hm_t.analisaCelula()
+        # # print(dadosCelula)
+
+
+        print((hm_t.getCoordinates(),
+            hm_t.getDirection())) 
         
-        # # # analisaCelula(hm_t)
-
-
-
+        
         # if(detetaBarreira(ev3)):
         #     ev3.speaker.beep(400,1000)
 
-        wait_for_button()
+        
         
 
 #sensorUltrasonic(ev3)
@@ -74,10 +101,4 @@ def wait_for_button():
 
 
 main()
-
-
-
-
-
-    
 
