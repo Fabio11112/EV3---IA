@@ -9,9 +9,11 @@ from verificaObstrucao import detetaBarreira
 from pybricks.tools import wait
 from colourSensor import detectar_cor
 from pybricks.parameters import Color
-from cores import detectar_cor_por_intervalo
+from cores import detectar_cor_por_intervalo, pre_configuracao_cores
 from pybricks.parameters import Button
 from gyroscope import reset_angle, adjust_angle
+from musicas import tocar_musica_vitoria, tocar_musica_derrota
+
 
 
 ev3 = EV3Brick()
@@ -22,9 +24,11 @@ SEGUNDOS = 5000
 
 #ev3State = {"coordinates": posicao_HT, "direction": 'N'}
 
-estava_em_torradeira = False
+
 #test(ev3)
 def main():
+    estava_em_torradeira = False
+    pre_configuracao_cores()
 
     print("está no ciclo\n")
     while True:
@@ -53,10 +57,12 @@ def main():
         if(dadosCelula["dados"]['bolor'] == 0):
             ev3.screen.print("Game Over")
             print("Game Over")
+            tocar_musica_derrota()
             break
         elif(dadosCelula["dados"]['manteiga'] == 0):
             ev3.screen.print("Victory")
             print("Victory")
+            tocar_musica_vitoria()
             break
         elif(dadosCelula["dados"]["torradeira"] == 0):
             if(not estava_em_torradeira):
@@ -71,6 +77,7 @@ def main():
         #hm_t.verificaBolor(ev3)
         if(hm_t.morto):
             print("Game Over")
+            
             ev3.screen.print("Game Over")
             break
 
@@ -99,6 +106,8 @@ def wait_for_button():
             break
         wait(100)
 
-
 main()
-
+#tocar_musica_derrota()
+#tocar_musica_vitoria()
+#print(detectar_cor())
+#(13, 31, 56)

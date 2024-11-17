@@ -152,12 +152,15 @@ class HomemTosta:
     def verifCor(self):
         rgb = detectar_cor()[0]
         cor = detectar_cor_por_intervalo(rgb[0], rgb[1], rgb[2])
-        print(cor)
+        #print(cor)
         return cor
         
-    def insereDados(self, dados, dadoLido):
-        options = {"N":3,"S":1,"E":0,"O":2}
-        dados[options[self.direction]] = dadoLido
+    def insereDados(self, dados, dadoLido, direcao):
+        #N, S, E, O
+        options = (3,0,1,2)
+        print(direcao)
+        dados[options[direcao]] = dadoLido
+        
         #dados.insert(options[self.direction], dadoLido)
         #[3]  manteiga;  [1]  torradeira;  [0]    bolor;  [2]  manteiga
 
@@ -167,30 +170,36 @@ class HomemTosta:
         count = 0
         indice = {"N": 0, "E": 1, "S": 2, "O": 3}
         barreira = [False]*4
-
+        print("Direcao: ", self.direction)
         direcaoInicial = indice[self.direction]
 
         dados = [3]*4 #valor default
-        valido = False
+        
         for _ in range(4):
+            valido = False
 
             isBarreira = detetaBarreira(self.ev3)
             wait(1000)
             cor = self.verifCor()
+            print("Cor analisada em insereDados:", cor)
 
             while not valido:
                 colors = {'Preto':0, 'Azul':1, 'Vermelho':2, 'Cor Desconhecida':3}
                 if(cor not in colors.keys()):
                     cor = "Cor Desconhecida"
-                self.insereDados(dados, colors[cor])
+                
+                print("valor de cor: ", colors[cor])
+                self.insereDados(dados, colors[cor], (direcaoInicial + _) % 4)
                 valido = True
 
             if(isBarreira):
                 print((direcaoInicial + _) % 4)
                 barreira[(direcaoInicial + _) % 4] = True
             turn (-90)
+        print("Dados captados: ", dados)
 
         barreiraDict = {"N": barreira[0], "E": barreira[1], "S": barreira[2], "O": barreira[3]}
+
         print(self.direction)
         print(barreiraDict)
         return {"dados":self.decodifica(dados), "barreira":barreiraDict}

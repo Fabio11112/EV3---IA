@@ -4,17 +4,12 @@ from pybricks.parameters import Port, Direction
 from pybricks.tools import wait
 #from movement import turn
 
-# Initialize the gyroscope sensor on port S1
+
 # Set positive direction as clockwise (default)
 left_motor = Motor(Port.A)
 right_motor = Motor(Port.B)
 
 robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=150)
-
-
-left_motor = Motor(Port.A)
-right_motor = Motor(Port.B)
-   
 
 
 def turn(angle):

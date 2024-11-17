@@ -1,6 +1,10 @@
 from pybricks.ev3devices import ColorSensor
 from pybricks.parameters import Port
 from pybricks.parameters import Color
+from pybricks.tools import wait
+from pybricks.hubs import EV3Brick
+
+ev3 = EV3Brick()
 
 sensor_de_cor = ColorSensor(Port.S2)
 # 0 = Sem cor, 1 = Preto, 2 = Azul, 3 = Verde, 4 = Amarelo, 5 = Vermelho, 6 = Branco, 7 = Castanho2
@@ -12,3 +16,23 @@ def detectar_cor():
     intensidade_luz_refletida = sensor_de_cor.reflection()
     
     return (cor_detectada, cor_nome)
+
+
+def pre_configuracao():
+    azul = sensor_de_cor.rgb()
+    print("azul: ", azul)
+    ev3.speaker.beep(400,200)
+    wait(2000)
+    vermelho = sensor_de_cor.rgb()
+    print("vermelho: ", vermelho)
+    ev3.speaker.beep(400,200)
+    wait(2000)
+    preto = sensor_de_cor.rgb()
+    print("preto: ", preto)
+    ev3.speaker.beep(400,200)
+    wait(2000)
+    branco = sensor_de_cor.rgb()
+    print("branco: ", branco)
+    ev3.speaker.beep(400,200)
+
+    return {"Azul":azul, "Vermelho":vermelho, "Preto":preto, "Branco":branco}
