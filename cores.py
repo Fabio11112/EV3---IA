@@ -4,6 +4,9 @@ from pybricks.parameters import Port
 from pybricks.hubs import EV3Brick
 from pybricks.tools import wait
 from colourSensor import pre_configuracao
+import json
+
+JSON_file = "cores.json"
 
 # Inicializar o hub EV3
 ev3 = EV3Brick()
@@ -31,7 +34,8 @@ cores_intervalos = {}
 
 def pre_configuracao_cores():
     r, g, b = 0, 1, 2 
-    cores = pre_configuracao()
+    cores = carregar_configuracao_cores(JSON_file)
+    #cores = pre_configuracao()
     for i in cores.keys():
         #wait(2000)
         cores_intervalos[i] = (cores[i][r]-20, cores[i][r]+20), (cores[i][g]-20, cores[i][g]+20), (cores[i][b]-20, cores[i][b]+20)
@@ -53,5 +57,8 @@ def detectar_cor_por_intervalo(r, g, b):
             return cor
     return "Cor desconhecida"
 
-
+def carregar_configuracao_cores(filename):
+    with open(filename, 'r') as json_file:
+        configuracao_cores = json.load(json_file)
+    return configuracao_cores
 # wait(2000)

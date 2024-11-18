@@ -7,7 +7,7 @@ from brickObject import HomemTosta
 from sensorUltrasonico import sensorUltrasonic
 from verificaObstrucao import detetaBarreira
 from pybricks.tools import wait
-from colourSensor import detectar_cor
+from colourSensor import detectar_cor, guardar_configuracao_cores
 from pybricks.parameters import Color
 from cores import detectar_cor_por_intervalo, pre_configuracao_cores
 from pybricks.parameters import Button
@@ -106,8 +106,5 @@ def wait_for_button():
             break
         wait(100)
 
-main()
-#tocar_musica_derrota()
-#tocar_musica_vitoria()
-#print(detectar_cor())
-#(13, 31, 56)
+#main()
+guardar_configuracao_cores()

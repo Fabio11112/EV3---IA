@@ -3,7 +3,9 @@ from pybricks.parameters import Port
 from pybricks.parameters import Color
 from pybricks.tools import wait
 from pybricks.hubs import EV3Brick
+import json
 
+JSON_file = "cores.json"
 ev3 = EV3Brick()
 
 sensor_de_cor = ColorSensor(Port.S2)
@@ -36,3 +38,9 @@ def pre_configuracao():
     ev3.speaker.beep(400,200)
 
     return {"Azul":azul, "Vermelho":vermelho, "Preto":preto, "Branco":branco}
+
+def guardar_configuracao_cores():
+    cores = pre_configuracao()
+    #cores = {"Azul": (0, 0, 0), "Vermelho": (0, 0, 0), "Preto": (0, 0, 0), "Branco": (0, 0, 0)}
+    with open(JSON_file, 'w') as f:
+        json.dump(cores, f, indent=4)
