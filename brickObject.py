@@ -16,6 +16,7 @@ gyro_sensor.reset_angle(90)
 
 print("Angulo acumulado inicio: ", gyro_sensor.angle())
 
+# Definição da classe "HomemTosta"
 class HomemTosta:
     
     def __init__(self, ev3):
@@ -25,6 +26,7 @@ class HomemTosta:
         self.morto = False
         self.distanciaBolor = 3
         self.ev3 = ev3
+        self.bolor = [2, 2]
         
 
     def verificaBolor(self, ev3):
@@ -51,7 +53,7 @@ class HomemTosta:
     def move(self, barreiras):
         print("A mover")
         moveDecision = mov_HT(self.coordinates, barreiras)
-        print(moveDecision)
+        #!print(moveDecision)
         
         # if not moveDecision:
         #     return moveDecision #falso
@@ -68,9 +70,8 @@ class HomemTosta:
         self.direction = moveDecision[1]
         self.coordinates = moveDecision[0]
         
-
     def goNorth(self):
-        print("Angulo acumulado em goNorth: ", gyro_sensor.angle())
+        #!print("Angulo acumulado em goNorth: ", gyro_sensor.angle())
         angle = 90
         if self.direction == 'N':
             self.goForward(angle)
@@ -84,7 +85,7 @@ class HomemTosta:
         self.direction = 'N'
         
     def goSouth(self):
-        print("Angulo acumulado em goSouth: ", gyro_sensor.angle())
+        #!print("Angulo acumulado em goSouth: ", gyro_sensor.angle())
         angle = -90
         if self.direction == 'N':
             self.goBackwards(angle)
@@ -96,9 +97,8 @@ class HomemTosta:
             self.goLeft(angle)
         self.direction = 'S'
         
-
     def goEast(self):
-        print("Angulo acumulado em goEast: ", gyro_sensor.angle())
+        #!print("Angulo acumulado em goEast: ", gyro_sensor.angle())
         angle = 0
         if self.direction == 'N':
             self.goRight(angle)
@@ -111,10 +111,8 @@ class HomemTosta:
 
         self.direction = 'E'
 
-        
-
     def goWest(self):
-        print("Angulo acumulado em goWest: ", gyro_sensor.angle())
+        #!print("Angulo acumulado em goWest: ", gyro_sensor.angle())
         angle = 180
         if self.direction == 'N':
             self.goLeft(angle)
@@ -126,9 +124,6 @@ class HomemTosta:
             self.goForward(angle)
 
         self.direction == 'O'
-
-        
-
 
     def goForward(self, angle):
         #adjust_angle(angle, gyro_sensor)
@@ -156,15 +151,17 @@ class HomemTosta:
         return cor
         
     def insereDados(self, dados, dadoLido, direcao):
-        #N, S, E, O
-        options = (3,0,1,2)
+        
+        options = (1,2,0)
+
+
+        #[M0, M1, T]
+
         print(direcao)
         dados[options[direcao]] = dadoLido
         
         #dados.insert(options[self.direction], dadoLido)
         #[3]  manteiga;  [1]  torradeira;  [0]    bolor;  [2]  manteiga
-
-  
 
     def analisaCelula(self):
         count = 0
@@ -173,28 +170,47 @@ class HomemTosta:
         print("Direcao: ", self.direction)
         direcaoInicial = indice[self.direction]
 
-        dados = [3]*4 #valor default
+        #dados = [3]*4 #valor default
+        dados = [3]*3 #valor default
+        
         
         for _ in range(4):
             valido = False
 
+            indiceDirecao = (direcaoInicial + _) % 4
+
             isBarreira = detetaBarreira(self.ev3)
             wait(1000)
-            cor = self.verifCor()
-            print("Cor analisada em insereDados:", cor)
-
-            while not valido:
-                colors = {'Preto':0, 'Azul':1, 'Vermelho':2, 'Cor Desconhecida':3}
-                if(cor not in colors.keys()):
-                    cor = "Cor Desconhecida"
-                
-                print("valor de cor: ", colors[cor])
-                self.insereDados(dados, colors[cor], (direcaoInicial + _) % 4)
-                valido = True
-
+            
+            
+            
             if(isBarreira):
-                print((direcaoInicial + _) % 4)
-                barreira[(direcaoInicial + _) % 4] = True
+                #!print(indiceDirecao)
+                barreira[indiceDirecao] = True
+                
+
+            if(indiceDirecao == 1): 
+                print("Bolor")
+                
+            else:
+                cor = self.verifCor()
+
+                #!print("Cor analisada em insereDados:", cor)
+
+                while not valido:
+                    colors = {'Preto':0, 'Azul':1, 'Vermelho':2, 'Cor Desconhecida':3}
+                    if(cor not in colors.keys()):
+                        cor = "Cor Desconhecida"
+                    
+                    indiceDirecao = (0 if indiceDirecao == 0 else indiceDirecao-1)
+
+                    #!print(indiceDirecao)
+
+                    print("valor de cor: ", colors[cor])
+                    self.insereDados(dados, colors[cor], indiceDirecao)
+                    valido = True
+
+
             turn (-90)
         print("Dados captados: ", dados)
 
@@ -206,16 +222,37 @@ class HomemTosta:
 
     def decodifica(self, dados):
 
-        print("Superior esquerdo :", )
-        bolor = 0
+        #!print("Superior esquerdo :", )
+        #bolor = 0
         torradeira = 0
         manteiga = 0
 
            
-        bolor = dados[0]
-        torradeira = dados[1]
-        manteiga = (dados[2] * (1)) + (dados[3] * (4)) #4**0 = 1, 4**1 = 4
+        torradeira = dados[2]
+        manteiga = (dados[0] * (1)) + (dados[1] * (4)) #4**0 = 1, 4**1 = 4
 
-        return {'bolor': bolor, 'torradeira': torradeira, 'manteiga': manteiga}
+        return {'torradeira': torradeira, 'manteiga': manteiga}
 
+    
+    def calculaNovaPosicaoBolor(self):
+        diferenca = [self.bolor[0] - self.coordinates[0], self.bolor[1] - self.coordinates[1]]
+
+        if (diferenca[1] > 0):  #o bolor vai para o norte
+            self.bolor = [self.bolor[0], self.bolor[1] - 1]
+        elif (diferenca[1] < 0): #o bolor vai para o sul
+            self.bolor = [self.bolor[0], self.bolor[1] + 1]
+        elif (diferenca[0] < 0): #o bolor vai para este
+            self.bolor = [self.bolor[0] + 1, self.bolor[1]]
+        elif (diferenca[0] > 0):  #o bolor vai para oeste
+            self.bolor = [self.bolor[0] - 1, self.bolor[1]]
+
+    
+        
+    
+    
+    
+    
+    
+    
+    
     #! def ajustaAngulo(self, targetAngle):

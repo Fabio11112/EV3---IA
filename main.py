@@ -54,7 +54,7 @@ def main():
 
         print(dadosCelula)
 
-        if(dadosCelula["dados"]['bolor'] == 0):
+        if(hm_t.coordinates == hm_t.bolor):
             ev3.screen.print("Game Over")
             print("Game Over")
             tocar_musica_derrota()
@@ -87,9 +87,15 @@ def main():
         # # dadosCelula = hm_t.analisaCelula()
         # # print(dadosCelula)
 
+        print("Posicao bolor: ", hm_t.bolor)
+        hm_t.calculaNovaPosicaoBolor()
+        print("Nova posicao bolor: ", hm_t.bolor)
 
-        print((hm_t.getCoordinates(),
+        print("(Coordenadas, Direção):", (hm_t.getCoordinates(),
             hm_t.getDirection())) 
+
+
+
         
         
         # if(detetaBarreira(ev3)):
@@ -106,5 +112,5 @@ def wait_for_button():
             break
         wait(100)
 
-#main()
-guardar_configuracao_cores()
+main()
+#guardar_configuracao_cores()

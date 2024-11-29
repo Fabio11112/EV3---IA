@@ -33,7 +33,8 @@ def imprime_tabuleiro():
 
 def mov_HT(posicao_HT, barreiras):
     #!Introduçao com movimento simpleficado
-    mov = {'N': (-1, 0), 'S': (1, 0), 'E': (0, 1), 'O': (0, -1)}
+    #mov = {'N': (-1, 0), 'S': (1, 0), 'E': (0, 1), 'O': (0, -1)}
+    mov = {'N': (0, -1), 'S': (0, 1), 'E': (1, 0), 'O': (-1, 0)}
     print(barreiras)
 
     newPositionChosen = False
