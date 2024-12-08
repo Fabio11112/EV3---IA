@@ -25,7 +25,18 @@ def inicializaTabuleiro():
         x_bar, y_bar = map(int, barreira.split(","))
 
         barreira_dir = input(f"Insira a direção da barreira (Norte, Sul, Este, Oeste): ")
+
         tabuleiro[y_bar][x_bar].setBarreiras(barreira_dir)
+
+        match barreira_dir:
+            case "Norte":
+                tabuleiro[y_bar - 1][x_bar].setBarreiras("Sul")
+            case "Sul":
+                tabuleiro[y_bar + 1][x_bar].setBarreiras("Norte")
+            case "Este":
+                tabuleiro[y_bar][x_bar + 1].setBarreiras("Oeste")
+            case "Oeste":
+                tabuleiro[y_bar][x_bar - 1].setBarreiras("Este")
 
         
 
