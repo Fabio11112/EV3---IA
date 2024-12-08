@@ -2,7 +2,6 @@ import turtle
 import random
 
 debug = True
-
 class HomemTosta:
     def __init__(self, turtle):
         self.tamanho_celula = 50
@@ -15,7 +14,24 @@ class HomemTosta:
         self.t.color("orange")
         self.t.penup()
 
-    ##fabio é gay ass: copilot
+
+    def isPerdeu(self):
+        if(self.posicaoAtual == self.posicaoBolor):
+            return True
+        
+        return False
+    
+    def isGanhou(self):
+        x = self.posicaoAtual[0]
+        y = self.posicaoAtual[1]    
+
+        if(self.tabuleiroExplorado[y][x].lerManteiga() == 0):
+            return True
+        
+    
+
+        return False
+  
     def lerCelula(self, celula):
         self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]] = celula    #Valores de x e y estão ao contrario
 

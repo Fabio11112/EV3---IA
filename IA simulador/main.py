@@ -1,32 +1,64 @@
 from tkinter import *
 from tkinter import ttk
-
+from random import randint
 from HomemTosta import HomemTosta
 from HomemTosta import Celula
 import turtle
 
+random = True
 
 #tabuleiro inicializado com celulas vazias
 tabuleiro = [[Celula() for _ in range(6)] for _ in range(6)]
 
 
 def inicializaTabuleiro():
+    x_mant, y_mant = 0, 0
+    x_torr, y_torr = 0, 0
+    n_barreiras = 0
+    x_bar, y_bar = 0, 0
 
-    manteiga = input(f"Insira a posição da manteiga (formato x,y): ")
-    x_mant, y_mant = map(int, manteiga.split(","))
+    if(random):
 
-    torradeira = input(f"Insira a posição da torradeira (formato x,y): ")
-    x_torr, y_torr = map(int, torradeira.split(","))
+        x_mant = randint(0,5)
+        y_mant = randint(0,5)
 
-    n_barreiras = input(f"Insira o número de barreiras: ")
+        x_torr = randint(0,5)
+        y_torr = randint(0,5)  
 
-    for i in range(int(n_barreiras)):
-        barreira = input(f"Insira a posição da célula da barreira (formato x,y): ")
-        x_bar, y_bar = map(int, barreira.split(","))
+        n_barreiras = randint(2,5)
+        
+    else:
+        manteiga = input(f"Insira a posição da manteiga (formato x,y): ")
+        x_mant, y_mant = map(int, manteiga.split(","))
 
-        barreira_dir = input(f"Insira a direção da barreira (Norte, Sul, Este, Oeste): ")
+        torradeira = input(f"Insira a posição da torradeira (formato x,y): ")
+        x_torr, y_torr = map(int, torradeira.split(","))
 
-        tabuleiro[y_bar][x_bar].setBarreiras(barreira_dir)
+        n_barreiras = input(f"Insira o número de barreiras: ")
+
+
+
+        for i in range(int(n_barreiras)):
+
+            barreira = ""
+
+            if(not random):
+                barreira = input(f"Insira a posição da célula da barreira (formato x,y): ")
+            else:
+                barreira = f"{randint(0,5)},{randint(0,5)}"
+
+                
+            x_bar, y_bar = map(int, barreira.split(","))
+
+            barreira_dir = ""
+
+            if(not random):
+                barreira_dir = input(f"Insira a direção da barreira (Norte, Sul, Este, Oeste): ")
+            else:
+                opcoes = ["Norte", "Sul", "Este", "Oeste"]
+                barreira_dir = opcoes[randint(0,3)] 
+
+            tabuleiro[y_bar][x_bar].setBarreiras(barreira_dir)
 
         match barreira_dir:
             case "Norte":
@@ -155,7 +187,7 @@ def main():
     hm = HomemTosta(t)
 
     inicializaTabuleiro()
-    desenha_tabuleiro(t, tela, tabuleiro, False)
+    #desenha_tabuleiro(t, tela, tabuleiro, False)
 
     i = 0
     hm.desenha(i)
@@ -163,12 +195,22 @@ def main():
     print(hm.posicaoAtual)
     while(True):
 
+
+
         celulaPresente = tabuleiro[hm.posicaoAtual[1]][hm.posicaoAtual[0]]
         hm.lerCelula(celulaPresente)
+
+        if hm.isPerdeu() or bolorChegouManteiga(hm):
+            print("Perdeu!")
+            break
+        
+        if hm.isGanhou() or bolorSeQueimou(hm):
+            print("Ganhou!")
+            break
         
         desenha_tabuleiro(t, tela, hm.tabuleiroExplorado)
 
-        desenha_tabuleiro(t, tela, tabuleiro, False)
+        #desenha_tabuleiro(t, tela, tabuleiro, False)
 
         print(hm.posicaoAtual)
         wait = input("Pressione Enter para continuar...")
@@ -176,14 +218,42 @@ def main():
         t.reset()
 
         hm.mover(i)
-        hm.moverBolor(i)
+
+        if(HmisInTorradeira(hm)):
+            hm.moverBolor(i)
+            hm.moverBolor(i)
+        else:
+            hm.moverBolor(i)
+
         i += 1
 
     t.done()
 
 
 
-    
+def HmisInTorradeira(hm):
+    x = hm.posicaoAtual[0]
+    y = hm.posicaoAtual[1]
+
+    if(tabuleiro[y][x].lerTorradeira() == 0):
+        return True
+    return False
+
+def bolorSeQueimou(hm):
+    x = hm.posicaoBolor[0]
+    y = hm.posicaoBolor[1]
+
+    if(tabuleiro[y][x].lerTorradeira() == 0):
+        return True
+    return False
+
+def bolorChegouManteiga(hm):
+    x = hm.posicaoBolor[0]
+    y = hm.posicaoBolor[1]
+
+    if(tabuleiro[y][x].lerManteiga() == 0):
+        return True
+    return False
 
 
 main()
