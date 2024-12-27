@@ -58,7 +58,9 @@ def inicializaTabuleiro():
                 opcoes = ["Norte", "Sul", "Este", "Oeste"]
                 barreira_dir = opcoes[randint(0,3)] 
 
+            
             tabuleiro[y_bar][x_bar].setBarreiras(barreira_dir)
+            
 
         match barreira_dir:
             case "Norte":
@@ -227,7 +229,7 @@ def main():
 
         i += 1
 
-    t.done()
+    
 
 
 
@@ -236,6 +238,7 @@ def HmisInTorradeira(hm):
     y = hm.posicaoAtual[1]
 
     if(tabuleiro[y][x].lerTorradeira() == 0):
+        print("Caíste na Torradeira")
         return True
     return False
 
@@ -244,6 +247,7 @@ def bolorSeQueimou(hm):
     y = hm.posicaoBolor[1]
 
     if(tabuleiro[y][x].lerTorradeira() == 0):
+        print("O Bolor se queimou")
         return True
     return False
 
