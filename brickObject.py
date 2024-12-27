@@ -246,10 +246,7 @@ class HomemTosta:
         elif (diferenca[0] > 0):  #o bolor vai para oeste
             self.bolor = [self.bolor[0] - 1, self.bolor[1]]
 
-    
-        
-    
-    
+
     
     
     

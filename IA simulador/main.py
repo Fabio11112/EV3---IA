@@ -171,7 +171,7 @@ def desenha_tabuleiro(turtle, tela, tabuleiro, isTabuleiroVisitado=True, tamanho
             x = j * tamanho_celula if(isTabuleiroVisitado) else (j - 6) * tamanho_celula
             y = -i * tamanho_celula if(isTabuleiroVisitado) else (-i + 6) * tamanho_celula
 
-            print(tabuleiro[i][j].__str__())
+            #print(tabuleiro[i][j].__str__())
             tabuleiro[i][j].desenha_celula(turtle, x, y, tamanho_celula, tabuleiro[i][j])
 
     # Atualizar a tela
@@ -195,12 +195,21 @@ def main():
     hm.desenha(i)
     hm.desenhaBolor(i)
     print(hm.posicaoAtual)
+    inicializada = False
+
     while(True):
-
-
-
         celulaPresente = tabuleiro[hm.posicaoAtual[1]][hm.posicaoAtual[0]]
         hm.lerCelula(celulaPresente)
+        
+        if(inicializada):
+            hm.atualizaCelulasManteiga(celulaPresente.lerManteiga())
+            hm.mostraCelulasManteiga()   
+
+        if(not inicializada):
+            hm.inicializaCelulasManteiga(celulaPresente.lerManteiga())
+            hm.mostraCelulasManteiga()
+            inicializada = True
+
 
         if hm.isPerdeu() or bolorChegouManteiga(hm):
             print("Perdeu!")
