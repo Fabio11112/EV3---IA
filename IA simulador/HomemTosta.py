@@ -9,6 +9,7 @@ class HomemTosta:
         self.posicaoAtual = (0, 0)  #posição inicial
         self.posicaoBolor = (5, 5)  
         self.celulasManteiga = []
+        self.celulasTorradeira = []
 
         self.t = turtle
         self.t.shape("circle")
@@ -117,14 +118,55 @@ class HomemTosta:
 
         self.celulasManteiga = celulasAtualizadas
 
+
+    def atualizaCelulasTorradeira(self, dist):
+
+        if(len(self.celulasTorradeira) == 1):
+            return
+
         
+        celulaPresente = self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]]
+        if(celulaPresente.lerTorradeira() == 0):
+            self.celulasTorradeira = [(self.posicaoAtual[0], self.posicaoAtual[1])]
+            return
+
+        if dist == ' ':
+            if (len(self.celulasTorradeira) > 1 and self.posicaoAtual in self.celulasTorradeira):
+                self.celulasTorradeira.remove(self.posicaoAtual)
+
+            return 
+
         
+        x = self.posicaoAtual[0]
+        y = self.posicaoAtual[1]
+
+        newCelulasTorradeira = []
+
+        if x + 1 < 6 and self.tabuleiroExplorado[y][x + 1].lerManteiga() == 0:
+            newCelulasTorradeira.append((x + 1, y))
+        if x - 1 >= 0 and self.tabuleiroExplorado[y][x - 1].lerManteiga() == 0:
+            newCelulasTorradeira.append((x - 1, y))
+        if y + 1 < 6 and self.tabuleiroExplorado[y + 1][x].lerManteiga() == 0:
+            newCelulasTorradeira.append((x, y + 1))
+        if y - 1 >= 0 and self.tabuleiroExplorado[y - 1][x].lerManteiga() == 0:
+            newCelulasTorradeira.append((x, y - 1))
 
 
+        if self.celulasTorradeira != []:
+            self.celulasTorradeira = list(set(self.celulasTorradeira) & set(newCelulasTorradeira))
+            return
+            
+        self.celulasTorradeira = newCelulasTorradeira
+
+                
+            
     def mostraCelulasManteiga(self):
         print(f"Células manteiga: \n{self.celulasManteiga}")
 
+    def mostraCelulasTorradeira(self):
+        print(f"Células torradeira: \n{self.celulasTorradeira}")
 
+    
 
 class Celula:
 

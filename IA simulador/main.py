@@ -19,8 +19,19 @@ def inicializaTabuleiro():
 
     if(random):
 
-        x_mant = randint(0,5)
-        y_mant = randint(0,5)
+        while True:                             #Evita escolher a posição da manteiga no bolor nem no hm
+            x_mant = randint(0,5)
+            y_mant = randint(0,5)
+            if not ((x_mant == 5 and y_mant == 5) or (x_mant == 0 and y_mant == 0)):
+                break
+
+
+        while True:                             #Evita escolher a posição da torradeira no bolor nem no hm nem na manteiga
+            x_torr = randint(0,5)
+            y_torr = randint(0,5)
+            if not ((x_torr == 5 and y_torr == 5) or (x_torr == 0 and y_torr == 0) or (x_torr == x_mant and y_torr == y_mant)):
+                break
+
 
         x_torr = randint(0,5)
         y_torr = randint(0,5)  
@@ -38,29 +49,29 @@ def inicializaTabuleiro():
 
 
 
-        for i in range(int(n_barreiras)):
+    for i in range(int(n_barreiras)):
 
-            barreira = ""
+        barreira = ""
 
-            if(not random):
-                barreira = input(f"Insira a posição da célula da barreira (formato x,y): ")
-            else:
-                barreira = f"{randint(0,5)},{randint(0,5)}"
-
-                
-            x_bar, y_bar = map(int, barreira.split(","))
-
-            barreira_dir = ""
-
-            if(not random):
-                barreira_dir = input(f"Insira a direção da barreira (Norte, Sul, Este, Oeste): ")
-            else:
-                opcoes = ["Norte", "Sul", "Este", "Oeste"]
-                barreira_dir = opcoes[randint(0,3)] 
+        if(not random):
+            barreira = input(f"Insira a posição da célula da barreira (formato x,y): ")
+        else:
+            barreira = f"{randint(0,5)},{randint(0,5)}"
 
             
-            tabuleiro[y_bar][x_bar].setBarreiras(barreira_dir)
-            
+        x_bar, y_bar = map(int, barreira.split(","))
+
+        barreira_dir = ""
+
+        if(not random):
+            barreira_dir = input(f"Insira a direção da barreira (Norte, Sul, Este, Oeste): ")
+        else:
+            opcoes = ["Norte", "Sul", "Este", "Oeste"]
+            barreira_dir = opcoes[randint(0,3)] 
+
+        
+        tabuleiro[y_bar][x_bar].setBarreiras(barreira_dir)
+        
 
         match barreira_dir:
             case "Norte":
@@ -203,7 +214,10 @@ def main():
         
         if(inicializada):
             hm.atualizaCelulasManteiga(celulaPresente.lerManteiga())
+            hm.atualizaCelulasTorradeira(celulaPresente.lerTorradeira())
+
             hm.mostraCelulasManteiga()   
+            hm.mostraCelulasTorradeira()
 
         if(not inicializada):
             hm.inicializaCelulasManteiga(celulaPresente.lerManteiga())
@@ -255,7 +269,7 @@ def bolorSeQueimou(hm):
     x = hm.posicaoBolor[0]
     y = hm.posicaoBolor[1]
 
-    if(tabuleiro[y][x].lerTorradeira() == 0):
+    if (tabuleiro[y][x].lerTorradeira() == 0):
         print("O Bolor se queimou")
         return True
     return False
@@ -270,4 +284,3 @@ def bolorChegouManteiga(hm):
 
 
 main()
-
