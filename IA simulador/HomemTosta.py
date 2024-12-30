@@ -16,6 +16,12 @@ class HomemTosta:
         self.t.color("orange")
         self.t.penup()
 
+    def manteigaDescoberta(self):
+        return len(self.celulasManteiga) == 1
+
+    def torradeiraDescoberta(self):
+        return len(self.celulasTorradeira) == 1
+
 
     def isPerdeu(self):
         if(self.posicaoAtual == self.posicaoBolor):
@@ -165,6 +171,16 @@ class HomemTosta:
 
     def mostraCelulasTorradeira(self):
         print(f"Células torradeira: \n{self.celulasTorradeira}")
+
+    def espalhaManteiga(self, x_mant, y_mant):
+        for i in range(6):
+            for j in range(6):
+                self.tabuleiroExplorado[j][i].setManteiga(abs(x_mant - i) + abs(y_mant - j))
+
+    def espalhaTorradeiraTabuleiroCompleto(self, x_torr, y_torr):
+        for i in range(6):
+            for j in range(6):
+                self.tabuleiroExplorado[j][i].setTorradeira(abs(x_torr - i) + abs(y_torr - j))
 
     
 

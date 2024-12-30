@@ -3,9 +3,10 @@ from tkinter import ttk
 from random import randint
 from HomemTosta import HomemTosta
 from HomemTosta import Celula
+from algoritmoIA import a_star_search
 import turtle
 
-random = True
+random = False
 
 #tabuleiro inicializado com celulas vazias
 tabuleiro = [[Celula() for _ in range(6)] for _ in range(6)]
@@ -33,7 +34,7 @@ def inicializaTabuleiro():
                 break
 
 
-        x_torr = randint(0,5)
+        x_torr = randint(0,5) 
         y_torr = randint(0,5)  
 
         n_barreiras = randint(2,5)
@@ -86,17 +87,10 @@ def inicializaTabuleiro():
         
 
 
-    espalhaManteiga2(x_mant, y_mant)
+    espalhaManteiga(x_mant, y_mant)
     espalhaTorradeira(x_torr, y_torr)
 
-    #tabuleiro[x_][y] = Celula()
-
-# def imprimeTabuleiro(tabuleiro):
-#     for y in range(len(tabuleiro)):
-#         print( _________________________________________________________________ )
-#         print([cel.__str__() for cel in tabuleiro[y]])
-#     print( _________________________________________________________________ )    
-
+    
 def imprimir_tabuleiro(tablero):
     """
     Imprime el tablero de forma visual, por bloques, con distancias y barreras.
@@ -151,15 +145,15 @@ def espalhaTorradeira(x_torr, y_torr):
         tabuleiro[y_torr][x_torr - 1].setTorradeira(1)
 
 
-
-
-
-#_______________________________________________________________________________________
-def espalhaManteiga2(x_mant, y_mant):
-    
+def espalhaManteiga(x_mant, y_mant):
     for i in range(6):
         for j in range(6):
             tabuleiro[j][i].setManteiga(abs(x_mant - i) + abs(y_mant - j))
+
+def espalhaTorradeiraTabuleiroCompleto(x_torr, y_torr):
+    for i in range(6):
+        for j in range(6):
+            tabuleiro[j][i].setTorradeira(abs(x_torr - i) + abs(y_torr - j))
 
 
 def desenha_tabuleiro(turtle, tela, tabuleiro, isTabuleiroVisitado=True, tamanho_celula=50):
@@ -191,6 +185,8 @@ def desenha_tabuleiro(turtle, tela, tabuleiro, isTabuleiroVisitado=True, tamanho
 
 
 def main():
+    torradeiraEspalhada, manteigaEspalhada = False, False
+
     t = turtle.Turtle()
     t.speed(0)
     t.hideturtle()
@@ -213,13 +209,37 @@ def main():
         hm.lerCelula(celulaPresente)
         
         if(inicializada):
-            hm.atualizaCelulasManteiga(celulaPresente.lerManteiga())
-            hm.atualizaCelulasTorradeira(celulaPresente.lerTorradeira())
+            if(not hm.manteigaDescoberta()):
+                hm.atualizaCelulasManteiga(celulaPresente.lerManteiga())
+                hm.mostraCelulasManteiga()
 
-            hm.mostraCelulasManteiga()   
-            hm.mostraCelulasTorradeira()
+                if(hm.manteigaDescoberta()):
+                    celula = hm.celulasManteiga[0]
+                    hm.espalhaManteiga(celula[0], celula[1])
 
-        if(not inicializada):
+                    a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0])
+                    #manteigaEspalhada = True
+
+            # elif(not manteigaEspalhada):
+            #     celula = hm.celulasManteiga[0]
+            #     hm.espalhaManteiga(celula[0], celula[1]) #(celula[0], celula[1]) == (x, y)  
+            #     manteigsEspalhada = True
+                
+
+            if(not hm.torradeiraDescoberta()):
+                hm.atualizaCelulasTorradeira(celulaPresente.lerTorradeira())
+                hm.mostraCelulasTorradeira()
+                if(hm.torradeiraDescoberta()):
+                    celula = hm.celulasTorradeira[0]
+                    hm.espalhaTorradeiraTabuleiroCompleto(celula[0], celula[1])
+                    #torradeiraEspalhada = True
+            # elif(not torradeiraEspalhada):
+            #     celula = hm.celulasTorradeira[0]
+            #     hm.espalhaTorradeiraTabuleiroCompleto(celula[0], celula[1])
+            #     torradeiraEspalhada = True
+
+
+        else:  #not inicializada
             hm.inicializaCelulasManteiga(celulaPresente.lerManteiga())
             hm.mostraCelulasManteiga()
             inicializada = True
