@@ -42,6 +42,7 @@ class HomemTosta:
   
     def lerCelula(self, celula):
         self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]] = celula    #Valores de x e y estão ao contrario
+        self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]].visitada = True
 
 
     #Usuario escolhe para onde se vai movimentar
@@ -190,6 +191,7 @@ class Celula:
         self.manteiga = 0
         self.torradeira = ' '
         self.barreiras = {"Norte": False, "Sul": False, "Este": False, "Oeste": False}
+        self.visitada = False
 
     # def __init__(self, manteiga, torradeira):
     #     self.manteiga = manteiga

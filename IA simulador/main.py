@@ -76,13 +76,17 @@ def inicializaTabuleiro():
 
         match barreira_dir:
             case "Norte":
-                tabuleiro[y_bar - 1][x_bar].setBarreiras("Sul")
+                if(y_bar - 1 > -1):
+                    tabuleiro[y_bar - 1][x_bar].setBarreiras("Sul")
             case "Sul":
-                tabuleiro[y_bar + 1][x_bar].setBarreiras("Norte")
+                if(y_bar + 1 < 6):
+                    tabuleiro[y_bar + 1][x_bar].setBarreiras("Norte")
             case "Este":
-                tabuleiro[y_bar][x_bar + 1].setBarreiras("Oeste")
+                if(x_bar + 1 < 6):
+                    tabuleiro[y_bar][x_bar + 1].setBarreiras("Oeste")
             case "Oeste":
-                tabuleiro[y_bar][x_bar - 1].setBarreiras("Este")
+                if(x_bar - 1 > -1):
+                    tabuleiro[y_bar][x_bar - 1].setBarreiras("Este")
 
         
 
@@ -217,8 +221,13 @@ def main():
                     celula = hm.celulasManteiga[0]
                     hm.espalhaManteiga(celula[0], celula[1])
 
-                    a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0])
+                    a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0], hm.posicaoBolor)
                     #manteigaEspalhada = True
+
+            else:
+                if(True in celulaPresente.barreiras.values()):
+                    a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0], hm.posicaoBolor)
+                    
 
             # elif(not manteigaEspalhada):
             #     celula = hm.celulasManteiga[0]
@@ -232,11 +241,8 @@ def main():
                 if(hm.torradeiraDescoberta()):
                     celula = hm.celulasTorradeira[0]
                     hm.espalhaTorradeiraTabuleiroCompleto(celula[0], celula[1])
-                    #torradeiraEspalhada = True
-            # elif(not torradeiraEspalhada):
-            #     celula = hm.celulasTorradeira[0]
-            #     hm.espalhaTorradeiraTabuleiroCompleto(celula[0], celula[1])
-            #     torradeiraEspalhada = True
+                    #a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasTorradeira[0], hm.posicaoBolor)
+
 
 
         else:  #not inicializada
