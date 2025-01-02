@@ -8,11 +8,19 @@ class HomemTosta:
         self.tabuleiroExplorado = [[Celula() for _ in range(6)] for _ in range(6)]  #criação de matriz 6x6
         self.posicaoAtual = (0, 0)  #posição inicial
         self.posicaoBolor = (5, 5)  
+        self.celulasManteiga = []
+        self.celulasTorradeira = []
 
         self.t = turtle
         self.t.shape("circle")
         self.t.color("orange")
         self.t.penup()
+
+    def manteigaDescoberta(self):
+        return len(self.celulasManteiga) == 1
+
+    def torradeiraDescoberta(self):
+        return len(self.celulasTorradeira) == 1
 
 
     def isPerdeu(self):
@@ -34,7 +42,10 @@ class HomemTosta:
   
     def lerCelula(self, celula):
         self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]] = celula    #Valores de x e y estão ao contrario
+        self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]].visitada = True
 
+
+    #Usuario escolhe para onde se vai movimentar
     def fazerDecisao(self):        
         while(True):
             result = 0
@@ -50,7 +61,8 @@ class HomemTosta:
                 continue
 
             return decisoes[result]
-        
+    
+    #Verifica a decisao e mexe-se na posição escolhida
     def mover(self, itr):
         direcao = self.fazerDecisao()
         if(direcao == "Norte"):
@@ -61,9 +73,9 @@ class HomemTosta:
             self.posicaoAtual = (self.posicaoAtual[0] + 1, self.posicaoAtual[1])
         elif(direcao == "Oeste"):
             self.posicaoAtual = (self.posicaoAtual[0] - 1, self.posicaoAtual[1])
-
         self.desenha(itr)
         
+    #Move o bolor consoante a posição do HomemTosta
     def moverBolor(self, itr):
         if(self.posicaoAtual[1] - self.posicaoBolor[1]<0):
             self.posicaoBolor = (self.posicaoBolor[0], self.posicaoBolor[1] - 1)
@@ -93,9 +105,85 @@ class HomemTosta:
         self.t.goto(x, y)
         self.t.write(f'B{itr}', align="center", font=("Arial", 6, "normal"))
 
+    def inicializaCelulasManteiga(self, dist):
+        for i in range(6):
+            for j in range(6):
+                if(i + j == dist):
+                    self.celulasManteiga.append((j, i))
+
+    def atualizaCelulasManteiga(self, dist):
+        print(f"Posição atual: {self.posicaoAtual}")
+        x = self.posicaoAtual[0]
+        y = self.posicaoAtual[1]
+        celulasAtualizadas = []
+
+        for i in self.celulasManteiga:
+            distancia = abs(x - i[0]) + abs(y - i[1])
+            print(f"Distância de célula {i}: {distancia}")
+            if(distancia == dist):
+                celulasAtualizadas.append(i)
+
+        self.celulasManteiga = celulasAtualizadas
+
+
+    def atualizaCelulasTorradeira(self, dist):
+
+        if(len(self.celulasTorradeira) == 1):
+            return
+
         
+        celulaPresente = self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]]
+        if(celulaPresente.lerTorradeira() == 0):
+            self.celulasTorradeira = [(self.posicaoAtual[0], self.posicaoAtual[1])]
+            return
+
+        if dist == ' ':
+            if (len(self.celulasTorradeira) > 1 and self.posicaoAtual in self.celulasTorradeira):
+                self.celulasTorradeira.remove(self.posicaoAtual)
+
+            return 
+
+        
+        x = self.posicaoAtual[0]
+        y = self.posicaoAtual[1]
+
+        newCelulasTorradeira = []
+
+        if x + 1 < 6 and self.tabuleiroExplorado[y][x + 1].lerManteiga() == 0:
+            newCelulasTorradeira.append((x + 1, y))
+        if x - 1 >= 0 and self.tabuleiroExplorado[y][x - 1].lerManteiga() == 0:
+            newCelulasTorradeira.append((x - 1, y))
+        if y + 1 < 6 and self.tabuleiroExplorado[y + 1][x].lerManteiga() == 0:
+            newCelulasTorradeira.append((x, y + 1))
+        if y - 1 >= 0 and self.tabuleiroExplorado[y - 1][x].lerManteiga() == 0:
+            newCelulasTorradeira.append((x, y - 1))
 
 
+        if self.celulasTorradeira != []:
+            self.celulasTorradeira = list(set(self.celulasTorradeira) & set(newCelulasTorradeira))
+            return
+            
+        self.celulasTorradeira = newCelulasTorradeira
+
+                
+            
+    def mostraCelulasManteiga(self):
+        print(f"Células manteiga: \n{self.celulasManteiga}")
+
+    def mostraCelulasTorradeira(self):
+        print(f"Células torradeira: \n{self.celulasTorradeira}")
+
+    def espalhaManteiga(self, x_mant, y_mant):
+        for i in range(6):
+            for j in range(6):
+                self.tabuleiroExplorado[j][i].setManteiga(abs(x_mant - i) + abs(y_mant - j))
+
+    def espalhaTorradeiraTabuleiroCompleto(self, x_torr, y_torr):
+        for i in range(6):
+            for j in range(6):
+                self.tabuleiroExplorado[j][i].setTorradeira(abs(x_torr - i) + abs(y_torr - j))
+
+    
 
 class Celula:
 
@@ -103,6 +191,7 @@ class Celula:
         self.manteiga = 0
         self.torradeira = ' '
         self.barreiras = {"Norte": False, "Sul": False, "Este": False, "Oeste": False}
+        self.visitada = False
 
     # def __init__(self, manteiga, torradeira):
     #     self.manteiga = manteiga
@@ -198,4 +287,4 @@ class Torradeira:
         return self.posicao
 
     def setPosicao(self, x, y):
-        self.posicao = (x, y)         
+        self.posicao = (x, y) 

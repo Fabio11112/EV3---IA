@@ -3,9 +3,10 @@ from tkinter import ttk
 from random import randint
 from HomemTosta import HomemTosta
 from HomemTosta import Celula
+from algoritmoIA import a_star_search
 import turtle
 
-random = True
+random = False
 
 #tabuleiro inicializado com celulas vazias
 tabuleiro = [[Celula() for _ in range(6)] for _ in range(6)]
@@ -19,10 +20,21 @@ def inicializaTabuleiro():
 
     if(random):
 
-        x_mant = randint(0,5)
-        y_mant = randint(0,5)
+        while True:                             #Evita escolher a posição da manteiga no bolor nem no hm
+            x_mant = randint(0,5)
+            y_mant = randint(0,5)
+            if not ((x_mant == 5 and y_mant == 5) or (x_mant == 0 and y_mant == 0)):
+                break
 
-        x_torr = randint(0,5)
+
+        while True:                             #Evita escolher a posição da torradeira no bolor nem no hm nem na manteiga
+            x_torr = randint(0,5)
+            y_torr = randint(0,5)
+            if not ((x_torr == 5 and y_torr == 5) or (x_torr == 0 and y_torr == 0) or (x_torr == x_mant and y_torr == y_mant)):
+                break
+
+
+        x_torr = randint(0,5) 
         y_torr = randint(0,5)  
 
         n_barreiras = randint(2,5)
@@ -38,52 +50,51 @@ def inicializaTabuleiro():
 
 
 
-        for i in range(int(n_barreiras)):
+    for i in range(int(n_barreiras)):
 
-            barreira = ""
+        barreira = ""
 
-            if(not random):
-                barreira = input(f"Insira a posição da célula da barreira (formato x,y): ")
-            else:
-                barreira = f"{randint(0,5)},{randint(0,5)}"
+        if(not random):
+            barreira = input(f"Insira a posição da célula da barreira (formato x,y): ")
+        else:
+            barreira = f"{randint(0,5)},{randint(0,5)}"
 
-                
-            x_bar, y_bar = map(int, barreira.split(","))
+            
+        x_bar, y_bar = map(int, barreira.split(","))
 
-            barreira_dir = ""
+        barreira_dir = ""
 
-            if(not random):
-                barreira_dir = input(f"Insira a direção da barreira (Norte, Sul, Este, Oeste): ")
-            else:
-                opcoes = ["Norte", "Sul", "Este", "Oeste"]
-                barreira_dir = opcoes[randint(0,3)] 
+        if(not random):
+            barreira_dir = input(f"Insira a direção da barreira (Norte, Sul, Este, Oeste): ")
+        else:
+            opcoes = ["Norte", "Sul", "Este", "Oeste"]
+            barreira_dir = opcoes[randint(0,3)] 
 
-            tabuleiro[y_bar][x_bar].setBarreiras(barreira_dir)
+        
+        tabuleiro[y_bar][x_bar].setBarreiras(barreira_dir)
+        
 
         match barreira_dir:
             case "Norte":
-                tabuleiro[y_bar - 1][x_bar].setBarreiras("Sul")
+                if(y_bar - 1 > -1):
+                    tabuleiro[y_bar - 1][x_bar].setBarreiras("Sul")
             case "Sul":
-                tabuleiro[y_bar + 1][x_bar].setBarreiras("Norte")
+                if(y_bar + 1 < 6):
+                    tabuleiro[y_bar + 1][x_bar].setBarreiras("Norte")
             case "Este":
-                tabuleiro[y_bar][x_bar + 1].setBarreiras("Oeste")
+                if(x_bar + 1 < 6):
+                    tabuleiro[y_bar][x_bar + 1].setBarreiras("Oeste")
             case "Oeste":
-                tabuleiro[y_bar][x_bar - 1].setBarreiras("Este")
+                if(x_bar - 1 > -1):
+                    tabuleiro[y_bar][x_bar - 1].setBarreiras("Este")
 
         
 
 
-    espalhaManteiga2(x_mant, y_mant)
+    espalhaManteiga(x_mant, y_mant)
     espalhaTorradeira(x_torr, y_torr)
 
-    #tabuleiro[x_][y] = Celula()
-
-# def imprimeTabuleiro(tabuleiro):
-#     for y in range(len(tabuleiro)):
-#         print( _________________________________________________________________ )
-#         print([cel.__str__() for cel in tabuleiro[y]])
-#     print( _________________________________________________________________ )    
-
+    
 def imprimir_tabuleiro(tablero):
     """
     Imprime el tablero de forma visual, por bloques, con distancias y barreras.
@@ -138,15 +149,15 @@ def espalhaTorradeira(x_torr, y_torr):
         tabuleiro[y_torr][x_torr - 1].setTorradeira(1)
 
 
-
-
-
-#_______________________________________________________________________________________
-def espalhaManteiga2(x_mant, y_mant):
-    
+def espalhaManteiga(x_mant, y_mant):
     for i in range(6):
         for j in range(6):
             tabuleiro[j][i].setManteiga(abs(x_mant - i) + abs(y_mant - j))
+
+def espalhaTorradeiraTabuleiroCompleto(x_torr, y_torr):
+    for i in range(6):
+        for j in range(6):
+            tabuleiro[j][i].setTorradeira(abs(x_torr - i) + abs(y_torr - j))
 
 
 def desenha_tabuleiro(turtle, tela, tabuleiro, isTabuleiroVisitado=True, tamanho_celula=50):
@@ -169,7 +180,7 @@ def desenha_tabuleiro(turtle, tela, tabuleiro, isTabuleiroVisitado=True, tamanho
             x = j * tamanho_celula if(isTabuleiroVisitado) else (j - 6) * tamanho_celula
             y = -i * tamanho_celula if(isTabuleiroVisitado) else (-i + 6) * tamanho_celula
 
-            print(tabuleiro[i][j].__str__())
+            #print(tabuleiro[i][j].__str__())
             tabuleiro[i][j].desenha_celula(turtle, x, y, tamanho_celula, tabuleiro[i][j])
 
     # Atualizar a tela
@@ -178,6 +189,8 @@ def desenha_tabuleiro(turtle, tela, tabuleiro, isTabuleiroVisitado=True, tamanho
 
 
 def main():
+    torradeiraEspalhada, manteigaEspalhada = False, False
+
     t = turtle.Turtle()
     t.speed(0)
     t.hideturtle()
@@ -193,12 +206,50 @@ def main():
     hm.desenha(i)
     hm.desenhaBolor(i)
     print(hm.posicaoAtual)
+    inicializada = False
+
     while(True):
-
-
-
         celulaPresente = tabuleiro[hm.posicaoAtual[1]][hm.posicaoAtual[0]]
         hm.lerCelula(celulaPresente)
+        
+        if(inicializada):
+            if(not hm.manteigaDescoberta()):
+                hm.atualizaCelulasManteiga(celulaPresente.lerManteiga())
+                hm.mostraCelulasManteiga()
+
+                if(hm.manteigaDescoberta()):
+                    celula = hm.celulasManteiga[0]
+                    hm.espalhaManteiga(celula[0], celula[1])
+
+                    a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0], hm.posicaoBolor)
+                    #manteigaEspalhada = True
+
+            else:
+                if(True in celulaPresente.barreiras.values()):
+                    a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0], hm.posicaoBolor)
+                    
+
+            # elif(not manteigaEspalhada):
+            #     celula = hm.celulasManteiga[0]
+            #     hm.espalhaManteiga(celula[0], celula[1]) #(celula[0], celula[1]) == (x, y)  
+            #     manteigsEspalhada = True
+                
+
+            if(not hm.torradeiraDescoberta()):
+                hm.atualizaCelulasTorradeira(celulaPresente.lerTorradeira())
+                hm.mostraCelulasTorradeira()
+                if(hm.torradeiraDescoberta()):
+                    celula = hm.celulasTorradeira[0]
+                    hm.espalhaTorradeiraTabuleiroCompleto(celula[0], celula[1])
+                    #a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasTorradeira[0], hm.posicaoBolor)
+
+
+
+        else:  #not inicializada
+            hm.inicializaCelulasManteiga(celulaPresente.lerManteiga())
+            hm.mostraCelulasManteiga()
+            inicializada = True
+
 
         if hm.isPerdeu() or bolorChegouManteiga(hm):
             print("Perdeu!")
@@ -227,7 +278,7 @@ def main():
 
         i += 1
 
-    t.done()
+    
 
 
 
@@ -236,6 +287,7 @@ def HmisInTorradeira(hm):
     y = hm.posicaoAtual[1]
 
     if(tabuleiro[y][x].lerTorradeira() == 0):
+        print("Caíste na Torradeira")
         return True
     return False
 
@@ -243,7 +295,8 @@ def bolorSeQueimou(hm):
     x = hm.posicaoBolor[0]
     y = hm.posicaoBolor[1]
 
-    if(tabuleiro[y][x].lerTorradeira() == 0):
+    if (tabuleiro[y][x].lerTorradeira() == 0):
+        print("O Bolor se queimou")
         return True
     return False
 
@@ -257,4 +310,3 @@ def bolorChegouManteiga(hm):
 
 
 main()
-
