@@ -118,14 +118,6 @@ def calculate_h_value_torradeira(x, y, x_bolor, y_bolor, manteiga, dest, celula)
 
     penalty_bvm_butter /= len(manteiga)
     
-    # if distance_bvm_butter == 0:
-    #     penalty_bvm_butter += 1000  # BVM on Butter (critical)
-    # elif distance_bvm_butter == 1:
-    #     penalty_bvm_butter += 50  # BVM adjacent to Butter
-
-    #print(f"h_toaster: {h_toaster}, penalty_bvm: {penalty_bvm}, penalty_bvm_butter: {penalty_bvm_butter}")
-    
-
     return (h_toaster + penalty_bvm + penalty_bvm_butter, (bvm_next_x, bvm_next_y))
 
 
@@ -147,7 +139,7 @@ def trace_path(cell_details, dest, isKillingBvm = False):
     
     text = "BVM" if isKillingBvm else "Manteiga"
 
-    print("Caminho: " + text + "\n")
+    print("Caminho: ", text, "\n")
     currentState = dest
 
     path = []
@@ -167,7 +159,7 @@ def trace_path(cell_details, dest, isKillingBvm = False):
     path.reverse()
 
     for i in path:
-        print(f"({i[0]}, {i[1]})")
+        print("(", i[0], ", ", i[1], ")")
     return path
 
 

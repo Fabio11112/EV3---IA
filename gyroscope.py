@@ -2,14 +2,21 @@ from pybricks.ev3devices import GyroSensor, Motor
 from pybricks.robotics import DriveBase
 from pybricks.parameters import Port, Direction
 from pybricks.tools import wait
-#from movement import turn
 
 
 # Set positive direction as clockwise (default)
 left_motor = Motor(Port.A)
 right_motor = Motor(Port.B)
 
-robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=150)
+print(left_motor)
+print(right_motor)
+
+wheel_diameter=55.5
+axle_track=150
+print("Wheel Diameter:", wheel_diameter)
+print("Axle Track:", axle_track)
+
+robot = DriveBase(left_motor, right_motor, wheel_diameter, axle_track)
 
 
 def turn(angle):
@@ -36,20 +43,20 @@ def adjust_angle(target_angle, gyro_sensor):
 
     angulo = target_angle - gyro_sensor.angle()
  
-    print("angulo: ", angulo)
+    #print("angulo: ", angulo)
     
     if(angulo>0):
         #target_angle = target_angle * 2
 
-            print("Vira COUNTER-CLOCKWISE")
-            print("targetAngle: ", target_angle)
-            print("angulo atual acumulado: ", gyro_sensor.angle())
+            # print("Vira COUNTER-CLOCKWISE")
+            # print("targetAngle: ", target_angle)
+            # print("angulo atual acumulado: ", gyro_sensor.angle())
 
 
             turn(angulo)
             angulo = target_angle - gyro_sensor.angle()
 
-            print("angulo: ", angulo)
+            #print("angulo: ", angulo)
 
 
             
@@ -57,15 +64,15 @@ def adjust_angle(target_angle, gyro_sensor):
         #while(angulo < 0):
 
 
-        print("Vira CLOCKWISE")
-        print("targetAngle: ", target_angle)
-        print("angulo atual acumulado: ", gyro_sensor.angle())
+        # print("Vira CLOCKWISE")
+        # print("targetAngle: ", target_angle)
+        # print("angulo atual acumulado: ", gyro_sensor.angle())
 
 
         turn(angulo)
         angulo = target_angle - gyro_sensor.angle()
             
-        print("angulo: ", angulo)
+        #print("angulo: ", angulo)
 
      
-    print("Angle after reset: ", gyro_sensor.angle())
+    #print("Angle after reset: ", gyro_sensor.angle())

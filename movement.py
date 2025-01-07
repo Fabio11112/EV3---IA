@@ -31,10 +31,6 @@ def avancar():
 def robotStraight(distancia):
     robot.straight(-distancia)
 
-
-
-
-
 def OneBlockForward(angle, gyro_sensor):
     adjust_angle(angle, gyro_sensor)
     robotStraight(forward)

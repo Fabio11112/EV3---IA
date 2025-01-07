@@ -1,7 +1,8 @@
 import turtle
 import random
 
-debug = True
+debug = False
+
 class HomemTosta:
     def __init__(self, turtle):
         self.tamanho_celula = 50
@@ -11,17 +12,24 @@ class HomemTosta:
         self.celulasManteiga = []
         self.celulasTorradeira = []
 
+        self.resolverManteiga = []
+        self.resolverTorradeira = []
+
+        self.isResolvingButter = False
+        self.isResolvingToaster = False
+
         self.t = turtle
         self.t.shape("circle")
         self.t.color("orange")
         self.t.penup()
+
+    
 
     def manteigaDescoberta(self):
         return len(self.celulasManteiga) == 1
 
     def torradeiraDescoberta(self):
         return len(self.celulasTorradeira) == 1
-
 
     def isPerdeu(self):
         if(self.posicaoAtual == self.posicaoBolor):
@@ -35,14 +43,80 @@ class HomemTosta:
 
         if(self.tabuleiroExplorado[y][x].lerManteiga() == 0):
             return True
-        
-    
-
         return False
   
     def lerCelula(self, celula):
         self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]] = celula    #Valores de x e y estão ao contrario
         self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]].visitada = True
+
+    def decideToResolve(self):
+        manteiga_len = len(self.resolverManteiga)
+        torradeira_len = len(self.resolverTorradeira) 
+
+        if(torradeira_len > 0):
+            if(manteiga_len == 0 or torradeira_len < manteiga_len):
+                self.isResolvingToaster = True
+                self.isResolvingButter = False
+            else:
+                self.isResolvingButter = True
+                self.isResolvingToaster = False
+        else:
+            if(manteiga_len != 0):
+                self.isResolvingButter = True
+                self.isResolvingToaster = False
+    
+    def calculateDirection(self, passo):
+        diferenca = (self.posicaoAtual[0] - passo[0], self.posicaoAtual[1] - passo[1])
+        if(diferenca[0] == 1):
+            #oeste
+            return 3
+        elif(diferenca[0] == -1):
+            #este
+            return 2
+        elif(diferenca[1] == 1):
+            #norte
+            return 0
+        elif(diferenca[1] == -1):
+            #sul
+            return 1
+
+    def seguintePasso(self):
+        if(self.isResolvingButter):
+            self.resolverManteiga.pop(0)
+            print(self.resolverManteiga[0])
+            return self.calculateDirection(self.resolverManteiga[0])
+            
+        elif(self.isResolvingToaster):
+            self.resolverTorradeira.pop(0)
+            print(self.resolverTorradeira[0])
+            return self.calculateDirection(self.resolverTorradeira[0])
+
+        else: #se tomarmos como verdade que bolor_x >= homem_tosta_x
+            celula_atual = self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]]
+
+            if(self.posicaoBolor == (5,1)):
+                if self.posicaoAtual == (4, 0):
+                    #oeste
+                    return 3
+
+            celula_4_0 = self.tabuleiroExplorado[0][4]
+            celula_3_1 = self.tabuleiroExplorado[1][3]
+
+            if(celula_4_0.visitada or celula_3_1.visitada):
+                
+                if(celula_atual.barreiras['Sul']):
+                    #oeste
+                    return 3
+                #sul
+                return 1
+
+            if(celula_atual.barreiras['Este']):
+                #sul
+                return 1
+            else:
+                #este
+                return 2
+
 
 
     #Usuario escolhe para onde se vai movimentar
@@ -53,12 +127,12 @@ class HomemTosta:
             if(debug):
                 result = int(input(f"Insira a seguinte direção da manteiga (0:'Norte', 1:'Sul', 2:'Este', 3:'Oeste') "))
             else:
-                result =  random.randint(0, 3)
-            if(self.posicaoAtual[1] == 0 and result == 0 or
-               self.posicaoAtual[1] == 5 and result == 1 or
-               self.posicaoAtual[0] == 0 and result == 3 or
-               self.posicaoAtual[0] == 5 and result == 2):
-                continue
+                result =  self.seguintePasso()
+            # if(self.posicaoAtual[1] == 0 and result == 0 or
+            #    self.posicaoAtual[1] == 5 and result == 1 or
+            #    self.posicaoAtual[0] == 0 and result == 3 or
+            #    self.posicaoAtual[0] == 5 and result == 2):
+            #     continue
 
             return decisoes[result]
     
@@ -119,7 +193,7 @@ class HomemTosta:
 
         for i in self.celulasManteiga:
             distancia = abs(x - i[0]) + abs(y - i[1])
-            print(f"Distância de célula {i}: {distancia}")
+            #print(f"Distância de célula {i}: {distancia}")
             if(distancia == dist):
                 celulasAtualizadas.append(i)
 
@@ -184,7 +258,6 @@ class HomemTosta:
                 self.tabuleiroExplorado[j][i].setTorradeira(abs(x_torr - i) + abs(y_torr - j))
 
     
-
 class Celula:
 
     def __init__(self):

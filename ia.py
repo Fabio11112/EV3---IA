@@ -15,7 +15,6 @@ posicao_Torradeira = [random.randint(0, Tab_Dimensao-1), random.randint(0, Tab_D
 #! Começa por criar a matriz de 6x6, vazia que vai representar o tabuleiro
 tab = [[' ' for _ in range(Tab_Dimensao)] for _ in range(Tab_Dimensao)]
 
-#tab(0, 0)
    # Coloca os elementos no tabuleiro
    
 tab[posicao_Torradeira[0]][posicao_Torradeira[1]] = 'T'
@@ -31,10 +30,12 @@ def imprime_tabuleiro():
     print("\n")
 
 
+
+
+
 def mov_HT(posicao_HT, barreiras):
     #!Introduçao com movimento simpleficado
-    #mov = {'N': (-1, 0), 'S': (1, 0), 'E': (0, 1), 'O': (0, -1)}
-    mov = {'N': (0, -1), 'S': (0, 1), 'E': (1, 0), 'O': (-1, 0)}
+    mov = {'Norte': (0, -1), 'Sul': (0, 1), 'Este': (1, 0), 'Oeste': (-1, 0)}
     print(barreiras)
 
     newPositionChosen = False
@@ -55,5 +56,3 @@ def mov_HT(posicao_HT, barreiras):
     print("O homem tosta moveu-se para: ")
     print(escolha)
     return [posicao_HT, escolha] #! retorna a nova posição do EV3
-
-

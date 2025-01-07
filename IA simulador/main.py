@@ -191,6 +191,7 @@ def desenha_tabuleiro(turtle, tela, tabuleiro, isTabuleiroVisitado=True, tamanho
 def main():
     torradeiraEspalhada, manteigaEspalhada = False, False
 
+
     t = turtle.Turtle()
     t.speed(0)
     t.hideturtle()
@@ -207,43 +208,71 @@ def main():
     hm.desenhaBolor(i)
     print(hm.posicaoAtual)
     inicializada = False
+    hmWasInTorradeira = False
 
     while(True):
         celulaPresente = tabuleiro[hm.posicaoAtual[1]][hm.posicaoAtual[0]]
         hm.lerCelula(celulaPresente)
         
         if(inicializada):
+            #manteiga no início da análise ainda sem descobrir
             if(not hm.manteigaDescoberta()):
+                numberButterBeforeUpdating = len(hm.celulasManteiga)
+
                 hm.atualizaCelulasManteiga(celulaPresente.lerManteiga())
                 hm.mostraCelulasManteiga()
 
+                #caso em que a torradeira já foi descoberta e se minimizam as células candidatas a ter a manteiga
+                #é necessário atualizar a árvore de pesquisa
+                if(hm.torradeiraDescoberta() and numberButterBeforeUpdating != 0 and numberButterBeforeUpdating > len(hm.celulasManteiga)):
+                    hm.resolverTorradeira = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasTorradeira[0], hm.posicaoBolor, True, hm.celulasManteiga)
+                    hm.decideToResolve()
+
+                #caso em que nesta iteração da análise foi, de facto, encontrada a localização da manteiga
                 if(hm.manteigaDescoberta()):
                     celula = hm.celulasManteiga[0]
                     hm.espalhaManteiga(celula[0], celula[1])
 
-                    a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0], hm.posicaoBolor)
-                    #manteigaEspalhada = True
+                    #faz a busca da manteiga
+                    hm.resolverManteiga = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0], hm.posicaoBolor)
+                    hm.decideToResolve()
 
+                    #atualizar busca da torradeira se esta já tinha sido descoberta
+                    if(hm.torradeiraDescoberta()):
+                        hm.resolverTorradeira = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasTorradeira[0], hm.posicaoBolor, True, hm.celulasManteiga)
+                        hm.decideToResolve()
+
+
+
+            #caso em que a manteiga já foi descoberta
             else:
+                #e que uma nova barreira haja sido descoberta, é necessário atualizar a árvore de pesquisa
                 if(True in celulaPresente.barreiras.values()):
-                    a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0], hm.posicaoBolor)
-                    
+                    hm.resolverManteiga = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0], hm.posicaoBolor)
+                    hm.decideToResolve()
 
-            # elif(not manteigaEspalhada):
-            #     celula = hm.celulasManteiga[0]
-            #     hm.espalhaManteiga(celula[0], celula[1]) #(celula[0], celula[1]) == (x, y)  
-            #     manteigsEspalhada = True
-                
+                if(hmWasInTorradeira):
+                    hm.resolverManteiga = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0], hm.posicaoBolor)
+                    hm.decideToResolve()
 
+
+            #torradeira no início da análise ainda sem descobrir
             if(not hm.torradeiraDescoberta()):
                 hm.atualizaCelulasTorradeira(celulaPresente.lerTorradeira())
                 hm.mostraCelulasTorradeira()
+
+                #caso em que nesta iteração da análise seja descoberta a torradeira
                 if(hm.torradeiraDescoberta()):
                     celula = hm.celulasTorradeira[0]
                     hm.espalhaTorradeiraTabuleiroCompleto(celula[0], celula[1])
-                    #a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasTorradeira[0], hm.posicaoBolor)
-
-
+                    hm.resolverTorradeira = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasTorradeira[0], hm.posicaoBolor, True, hm.celulasManteiga)
+                    hm.decideToResolve()
+            #torradeira já tinha sido encontrada
+            else:
+                #e que uma nova barreira haja sido descoberta, é necessário atualizar a árvore de pesquisa
+                if(True in celulaPresente.barreiras.values() and not celulaPresente.visitada):
+                    hm.resolverTorradeira = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasTorradeira[0], hm.posicaoBolor, True, hm.celulasManteiga)
+                    hm.decideToResolve()
 
         else:  #not inicializada
             hm.inicializaCelulasManteiga(celulaPresente.lerManteiga())
@@ -251,19 +280,25 @@ def main():
             inicializada = True
 
 
-        if hm.isPerdeu() or bolorChegouManteiga(hm):
-            print("Perdeu!")
+
+        if hm.isGanhou(): 
+            print("HT chegou à Manteiga")
             break
-        
-        if hm.isGanhou() or bolorSeQueimou(hm):
-            print("Ganhou!")
+        if hm.isPerdeu():
+            print("O Bolor chegou ao HT")
+            break
+        if(bolorChegouManteiga(hm)):
+            print("O Bolor chegou à Manteiga")
+            break
+        if bolorSeQueimou(hm):
+            print("O Bolor se queimou")
             break
         
         desenha_tabuleiro(t, tela, hm.tabuleiroExplorado)
 
         #desenha_tabuleiro(t, tela, tabuleiro, False)
 
-        print(hm.posicaoAtual)
+        #print(hm.posicaoAtual)
         wait = input("Pressione Enter para continuar...")
 
         t.reset()
@@ -273,13 +308,12 @@ def main():
         if(HmisInTorradeira(hm)):
             hm.moverBolor(i)
             hm.moverBolor(i)
+            hmWasInTorradeira = True
         else:
             hm.moverBolor(i)
+            hmWasInTorradeira = False
 
         i += 1
-
-    
-
 
 
 def HmisInTorradeira(hm):
