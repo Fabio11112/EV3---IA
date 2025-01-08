@@ -9,8 +9,14 @@ class HomemTosta:
         self.tabuleiroExplorado = [[Celula() for _ in range(6)] for _ in range(6)]  #criação de matriz 6x6
         self.posicaoAtual = (0, 0)  #posição inicial
         self.posicaoBolor = (5, 5)  
-        self.celulasManteiga = []
+        self.celulasManteiga = [] 
         self.celulasTorradeira = []
+
+        for i in range(6):
+            for j in range(6):
+                if(i == 0 and j == 0):
+                    continue
+                self.celulasTorradeira.append((i, j))
 
         self.resolverManteiga = []
         self.resolverTorradeira = []
@@ -200,46 +206,106 @@ class HomemTosta:
         self.celulasManteiga = celulasAtualizadas
 
 
-    def atualizaCelulasTorradeira(self, dist):
+    # def atualizaCelulasTorradeira(self, dist):
 
-        if(len(self.celulasTorradeira) == 1):
-            return
+    #     if(len(self.celulasTorradeira) == 1):
+    #         return
+
+
+    #     i = 0
+
+    #     while i < len(self.celulasTorradeira):
+    #         moves = [(0,-1), (0, 1), (1, 0), (-1, 0)]
+    #         j = 0
+    #         while j < len(moves):
+    #             print("i", i)
+    #             print("len", len(self.celulasTorradeira))
+    #             movement = (self.celulasTorradeira[i][0] + moves[j][0], self.celulasTorradeira[i][1] + moves[j][1])
+    #             if(movement[0] > 5 or movement[0] < 0 or movement[1] > 5 or movement[1] < 0):
+    #                 j += 1
+    #                 continue
+
+    #             celula = self.tabuleiroExplorado[movement[1]][movement[0]]
+    #             print("Visitada (", movement[0], ", ", movement[1], ")?: ", celula.visitada)
+    #             print("torradeira 0?: ", celula.lerTorradeira())
+    #             if(celula.visitada and celula.lerTorradeira() == ' '):
+    #                 self.celulasTorradeira.remove(self.celulasTorradeira[i])
+    #                 break
+    #             elif(j == len(moves) - 1):
+    #                 i += 1
+
+    #             j += 1
+        
+    #     celulaPresente = self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]]
+    #     if(celulaPresente.lerTorradeira() == 0):
+    #         self.celulasTorradeira = [(self.posicaoAtual[0], self.posicaoAtual[1])]
+    #         return
 
         
-        celulaPresente = self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]]
-        if(celulaPresente.lerTorradeira() == 0):
-            self.celulasTorradeira = [(self.posicaoAtual[0], self.posicaoAtual[1])]
-            return
 
-        if dist == ' ':
-            if (len(self.celulasTorradeira) > 1 and self.posicaoAtual in self.celulasTorradeira):
+    #     if dist == ' ':
+    #         if (len(self.celulasTorradeira) > 1 and self.posicaoAtual in self.celulasTorradeira):
+    #             self.celulasTorradeira.remove(self.posicaoAtual)
+    #         return 
+
+        
+    #     x = self.posicaoAtual[0]
+    #     y = self.posicaoAtual[1]
+
+    #     newCelulasTorradeira = []
+
+    #     if x + 1 < 6 and self.tabuleiroExplorado[y][x + 1].lerManteiga() == 0:
+    #         newCelulasTorradeira.append((x + 1, y))
+    #     if x - 1 >= 0 and self.tabuleiroExplorado[y][x - 1].lerManteiga() == 0:
+    #         newCelulasTorradeira.append((x - 1, y))
+    #     if y + 1 < 6 and self.tabuleiroExplorado[y + 1][x].lerManteiga() == 0:
+    #         newCelulasTorradeira.append((x, y + 1))
+    #     if y - 1 >= 0 and self.tabuleiroExplorado[y - 1][x].lerManteiga() == 0:
+    #         newCelulasTorradeira.append((x, y - 1))
+
+
+    #     if self.celulasTorradeira != []:
+    #         self.celulasTorradeira = list(set(self.celulasTorradeira) & set(newCelulasTorradeira))
+    #         return
+            
+    #     self.celulasTorradeira = newCelulasTorradeira
+
+    def atualizaCelulasTorradeira(self, dist):
+        around = {(0, 1), (0, -1), (1, 0), (-1, 0)}
+        if dist == " ":
+            for i in around:
+                position = (self.posicaoAtual[0] + i[0], self.posicaoAtual[1] + i[1])
+                if(position[0] < 6 and position[0] >= 0 and position[1] < 6 and position[1] >= 0):
+                    x_ht, y_ht = self.posicaoAtual
+                    if(position in self.celulasTorradeira):
+                        self.celulasTorradeira.remove(position)
+            
+            if(self.posicaoAtual in self.celulasTorradeira):   
                 self.celulasTorradeira.remove(self.posicaoAtual)
 
-            return 
-
-        
-        x = self.posicaoAtual[0]
-        y = self.posicaoAtual[1]
-
-        newCelulasTorradeira = []
-
-        if x + 1 < 6 and self.tabuleiroExplorado[y][x + 1].lerManteiga() == 0:
-            newCelulasTorradeira.append((x + 1, y))
-        if x - 1 >= 0 and self.tabuleiroExplorado[y][x - 1].lerManteiga() == 0:
-            newCelulasTorradeira.append((x - 1, y))
-        if y + 1 < 6 and self.tabuleiroExplorado[y + 1][x].lerManteiga() == 0:
-            newCelulasTorradeira.append((x, y + 1))
-        if y - 1 >= 0 and self.tabuleiroExplorado[y - 1][x].lerManteiga() == 0:
-            newCelulasTorradeira.append((x, y - 1))
-
-
-        if self.celulasTorradeira != []:
-            self.celulasTorradeira = list(set(self.celulasTorradeira) & set(newCelulasTorradeira))
             return
             
-        self.celulasTorradeira = newCelulasTorradeira
 
-                
+        if dist == 1:
+            i = 0
+            while i < len(self.celulasTorradeira):
+                x, y = self.posicaoAtual
+                diferenca = abs(x - self.celulasTorradeira[i][0]) + abs(y - self.celulasTorradeira[i][1])
+                print("diferenca: ", diferenca)
+                print("celula: ", self.celulasTorradeira[i])
+                if(diferenca != 1):
+                    self.celulasTorradeira.remove(self.celulasTorradeira[i])
+                else:
+                    i += 1
+            
+            if(self.posicaoAtual in self.celulasTorradeira):   
+                self.celulasTorradeira.remove(self.posicaoAtual)
+            return
+
+        if dist == 0:
+            self.celulasTorradeira = [(self.posicaoAtual[0], self.posicaoAtual[1])]
+
+
             
     def mostraCelulasManteiga(self):
         print(f"Células manteiga: \n{self.celulasManteiga}")

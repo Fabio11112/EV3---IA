@@ -43,14 +43,14 @@ def adjust_angle(target_angle, gyro_sensor):
 
     angulo = target_angle - gyro_sensor.angle()
  
-    #print("angulo: ", angulo)
+    print("diferença de ângulos: ", angulo)
     
     if(angulo>0):
         #target_angle = target_angle * 2
 
-            # print("Vira COUNTER-CLOCKWISE")
-            # print("targetAngle: ", target_angle)
-            # print("angulo atual acumulado: ", gyro_sensor.angle())
+            print("Vira COUNTER-CLOCKWISE")
+            print("targetAngle: ", target_angle)
+            print("angulo atual acumulado: ", gyro_sensor.angle())
 
 
             turn(angulo)
@@ -64,15 +64,15 @@ def adjust_angle(target_angle, gyro_sensor):
         #while(angulo < 0):
 
 
-        # print("Vira CLOCKWISE")
-        # print("targetAngle: ", target_angle)
-        # print("angulo atual acumulado: ", gyro_sensor.angle())
+        print("Vira CLOCKWISE")
+        print("targetAngle: ", target_angle)
+        print("angulo atual acumulado: ", gyro_sensor.angle())
 
 
         turn(angulo)
         angulo = target_angle - gyro_sensor.angle()
             
-        #print("angulo: ", angulo)
+        print("angulo: ", angulo)
 
      
     #print("Angle after reset: ", gyro_sensor.angle())

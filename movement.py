@@ -13,7 +13,7 @@ from pybricks.tools import wait
 # left_motor = Motor(Port.A)
 # right_motor = Motor(Port.B)
 
-forward = 550
+forward = 560
 ev3 = EV3Brick()
 
 
