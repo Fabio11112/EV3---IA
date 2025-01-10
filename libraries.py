@@ -5,3 +5,5 @@ from pybricks.robotics import DriveBase
 from pybricks.media.ev3dev import SoundFile, ImageFile
 from pybricks.hubs import EV3Brick
 from pybricks.media.ev3dev import SoundFile
+"""
+Este arquivo contém as bibliotecas necessárias para o funcionamento do robô."""

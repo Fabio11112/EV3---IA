@@ -8,7 +8,10 @@ SIXTEENTH_NOTE = 50 # Nota semicorchea rápida
 
 ev3 = EV3Brick()
 
+
 def tocar_musica_vitoria():
+    """método que reproduz a música de vitória
+    """
     # Sequência de notas para a musiquinha de vitória
     victory_melody = [
         (523, 300),  # C5
@@ -23,6 +26,8 @@ def tocar_musica_vitoria():
     tocar_musica(ev3, victory_melody)
 
 def tocar_musica_derrota():
+    """método que reproduz a música de derrota
+    """
 # Notas e durações da música de Game Over do Super Mario Bros (frequências em Hz e duração em ms)
     melody = [
         (659, 300),  # E5
@@ -39,6 +44,12 @@ def tocar_musica_derrota():
 
 # Método para reproduzir a música
 def tocar_musica(ev3, musica):
+    """método que reproduz uma música
+
+    Args:
+        ev3 (EV3Brick): objeto do processador EV3
+        musica (lista): lista com as frequências das notas e durações de cada uma
+    """
     for nota, duracao in musica:
         if nota == 0:
             wait(duracao)  # Pausa
@@ -46,11 +57,10 @@ def tocar_musica(ev3, musica):
             ev3.speaker.beep(frequency=nota, duration=duracao)
         wait(50)  # Pausa curta entre as notas
 
-# Toca a música de Game Over
-
-
 
 def imperialMarch():
+    """método que reproduz a música de Star Wars "Imperial March"
+    """
 # Define the notes (in Hz) and durations (in ms) for the Imperial March
     imperial_march = [
         (440, 500),  # A4
@@ -73,7 +83,6 @@ def imperialMarch():
         (440, 1000)  # A4
     ]
 
-    # Play each note in the sequence
     for freq, duration in imperial_march:
         ev3.speaker.beep(freq, duration)
         wait(duration/2)
@@ -83,6 +92,8 @@ def imperialMarch():
 
 
 def batman_melody():
+    """método que reproduz a música do Batman "Na na na na na na na na Batman!"
+    """
 
     # Definimos las frecuencias de las notas (en Hz)
     G4 = 392  # G4: La nota "sol" en la cuarta octava

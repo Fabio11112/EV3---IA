@@ -5,45 +5,67 @@ debug = False
 
 class HomemTosta:
     def __init__(self, turtle):
-        self.tamanho_celula = 50
+        """
+        __init__ - Construtor da classe HomemTosta
+
+        :param turtle: objeto turtle para desenhar o tabuleiro
+        """
+        self.tamanho_celula = 50 #tamanho da célula
         self.tabuleiroExplorado = [[Celula() for _ in range(6)] for _ in range(6)]  #criação de matriz 6x6
         self.posicaoAtual = (0, 0)  #posição inicial
-        self.posicaoBolor = (5, 5)  
-        self.celulasManteiga = [] 
-        self.celulasTorradeira = []
+        self.posicaoBolor = (5, 5)  #posição do bolor
+        self.celulasManteiga = [] #lista de células com manteiga
+        self.celulasTorradeira = [] #lista de células com torradeira
 
-        for i in range(6):
+        for i in range(6): #preenchimento da lista de células com manteiga
             for j in range(6):
                 if(i == 0 and j == 0):
                     continue
                 self.celulasTorradeira.append((i, j))
 
-        self.resolverManteiga = []
-        self.resolverTorradeira = []
+        self.resolverManteiga = [] #lista de células a resolver com manteiga
+        self.resolverTorradeira = [] #lista de células a resolver com torradeira
 
-        self.isResolvingButter = False
-        self.isResolvingToaster = False
+        self.isResolvingButter = False #flag para resolver manteiga
+        self.isResolvingToaster = False #flag para resolver torradeira
 
-        self.t = turtle
-        self.t.shape("circle")
-        self.t.color("orange")
-        self.t.penup()
+        self.t = turtle #objeto turtle para desenhar o tabuleiro
+        self.t.shape("circle") #forma do objeto turtle
+        self.t.color("orange") #cor do objeto turtle
+        self.t.penup() #não desenhar
 
     
-
     def manteigaDescoberta(self):
+        """
+        manteigaDescoberta - Verifica se a manteiga foi descoberta
+
+        :return: True se a manteiga foi descoberta, False caso contrário
+        """
         return len(self.celulasManteiga) == 1
 
     def torradeiraDescoberta(self):
+        """
+        torradeiraDescoberta - Verifica se a torradeira foi descoberta
+
+        :return: True se a torradeira foi descoberta, False caso contrário
+        """
         return len(self.celulasTorradeira) == 1
 
     def isPerdeu(self):
+        """
+        isPerdeu - Verifica se o HomemTosta perdeu
+        :return: True se o HomemTosta perdeu, False caso contrário
+        """
         if(self.posicaoAtual == self.posicaoBolor):
             return True
         
         return False
     
     def isGanhou(self):
+        """
+        isGanhou - Verifica se o HomemTosta ganhou
+        :return: True se o HomemTosta ganhou, False caso contrário
+        """
         x = self.posicaoAtual[0]
         y = self.posicaoAtual[1]    
 
@@ -52,10 +74,20 @@ class HomemTosta:
         return False
   
     def lerCelula(self, celula):
+        """
+        lerCelula - Lê a célula do tabuleiro explorado
+
+        :param celula: tuplo com as coordenadas da célula
+        :return: objeto Celula
+        """
         self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]] = celula    #Valores de x e y estão ao contrario
         self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]].visitada = True
 
-    def decideToResolve(self):
+    def decideToResolve(self): 
+        """Classe que representa o Homem Tosta no simulador.
+
+        Esta classe gerencia o estado e o movimento do Homem Tosta, incluindo a interação com manteiga e torradeira.
+        """ 
         manteiga_len = len(self.resolverManteiga)
         torradeira_len = len(self.resolverTorradeira) 
 
@@ -72,6 +104,15 @@ class HomemTosta:
                 self.isResolvingToaster = False
     
     def calculateDirection(self, passo):
+        """Calcula a direção do movimento com base no passo fornecido.
+
+        Args:
+            passo (tuple): Uma tuple representando o passo ou movimento na forma (x, y).
+
+        Returns:
+            int: Um inteiro representando a direção do movimento.
+                 3 para oeste, 2 para leste, 1 para norte e 0 para sul.
+        """
         diferenca = (self.posicaoAtual[0] - passo[0], self.posicaoAtual[1] - passo[1])
         if(diferenca[0] == 1):
             #oeste
@@ -87,6 +128,11 @@ class HomemTosta:
             return 1
 
     def seguintePasso(self):
+        """Determina o próximo passo do Homem Tosta no simulador.
+
+        Returns:
+            tuple: Uma tuple representando o próximo passo na forma (x, y).
+        """
         if(self.isResolvingButter):
             self.resolverManteiga.pop(0)
             print(self.resolverManteiga[0])
@@ -125,8 +171,13 @@ class HomemTosta:
 
 
 
-    #Usuario escolhe para onde se vai movimentar
-    def fazerDecisao(self):        
+    #Utilizador escolhe para onde se vai movimentar
+    def fazerDecisao(self):
+        """Permite ao Homem Tosta escolher a direção para se mover.
+
+        Returns:
+            str: Uma string representando a direção escolhida.
+        """         
         while(True):
             result = 0
             decisoes = {0:"Norte", 1:"Sul", 2:"Este", 3:"Oeste"}
@@ -134,16 +185,15 @@ class HomemTosta:
                 result = int(input(f"Insira a seguinte direção da manteiga (0:'Norte', 1:'Sul', 2:'Este', 3:'Oeste') "))
             else:
                 result =  self.seguintePasso()
-            # if(self.posicaoAtual[1] == 0 and result == 0 or
-            #    self.posicaoAtual[1] == 5 and result == 1 or
-            #    self.posicaoAtual[0] == 0 and result == 3 or
-            #    self.posicaoAtual[0] == 5 and result == 2):
-            #     continue
-
             return decisoes[result]
     
     #Verifica a decisao e mexe-se na posição escolhida
     def mover(self, itr):
+        """Atualiza o estado do Homem Tosta com base em uma iteração fornecida.
+
+        Args:
+        itr (int): O número da iteração atual.
+        """ 
         direcao = self.fazerDecisao()
         if(direcao == "Norte"):
             self.posicaoAtual = (self.posicaoAtual[0], self.posicaoAtual[1] - 1)
@@ -157,6 +207,10 @@ class HomemTosta:
         
     #Move o bolor consoante a posição do HomemTosta
     def moverBolor(self, itr):
+        """Move o bolor com base na posição atual do Homem Tosta.
+            Args:
+            itr (int): O número da iteração atual.
+        """
         if(self.posicaoAtual[1] - self.posicaoBolor[1]<0):
             self.posicaoBolor = (self.posicaoBolor[0], self.posicaoBolor[1] - 1)
         elif(self.posicaoAtual[1] - self.posicaoBolor[1] > 0):
@@ -169,7 +223,10 @@ class HomemTosta:
         self.desenhaBolor(itr)
 
     def desenha(self, itr):
-        """Draw ToastMan on the board at the current position."""
+        """Desenha o  Homem Tosta no quadro na posição atual.
+            Args: 
+            itr (int): O número da iteração atual.
+        """
         x = self.posicaoAtual[0] * self.tamanho_celula + self.tamanho_celula / 2
         y = -self.posicaoAtual[1] * self.tamanho_celula - self.tamanho_celula / 2
         self.t.penup()
@@ -178,7 +235,9 @@ class HomemTosta:
         
 
     def desenhaBolor(self, itr):
-        """Draw ToastMan on the board at the current position."""
+        """Desenha o bolor no quadro da interação atual.
+            Args:
+            itr (int): O número da iteração atual."""
         x = self.posicaoBolor[0] * self.tamanho_celula + self.tamanho_celula / 2
         y = -self.posicaoBolor[1] * self.tamanho_celula - self.tamanho_celula / 2
         self.t.penup()
@@ -186,12 +245,23 @@ class HomemTosta:
         self.t.write(f'B{itr}', align="center", font=("Arial", 6, "normal"))
 
     def inicializaCelulasManteiga(self, dist):
+        """ 
+        inicializaCelulasManteiga - Inicializa as células com manteiga.
+        Args:
+        dist (int): A distância da manteiga em relação à posição inicial.
+        """
         for i in range(6):
             for j in range(6):
                 if(i + j == dist):
                     self.celulasManteiga.append((j, i))
 
     def atualizaCelulasManteiga(self, dist):
+        """
+        atualizaCelulasManteiga - Atualiza as células com manteiga.
+        Args:
+        dist (int): A distância da manteiga em relação à posição atual.
+
+        """
         print(f"Posição atual: {self.posicaoAtual}")
         x = self.posicaoAtual[0]
         y = self.posicaoAtual[1]
@@ -205,72 +275,12 @@ class HomemTosta:
 
         self.celulasManteiga = celulasAtualizadas
 
-
-    # def atualizaCelulasTorradeira(self, dist):
-
-    #     if(len(self.celulasTorradeira) == 1):
-    #         return
-
-
-    #     i = 0
-
-    #     while i < len(self.celulasTorradeira):
-    #         moves = [(0,-1), (0, 1), (1, 0), (-1, 0)]
-    #         j = 0
-    #         while j < len(moves):
-    #             print("i", i)
-    #             print("len", len(self.celulasTorradeira))
-    #             movement = (self.celulasTorradeira[i][0] + moves[j][0], self.celulasTorradeira[i][1] + moves[j][1])
-    #             if(movement[0] > 5 or movement[0] < 0 or movement[1] > 5 or movement[1] < 0):
-    #                 j += 1
-    #                 continue
-
-    #             celula = self.tabuleiroExplorado[movement[1]][movement[0]]
-    #             print("Visitada (", movement[0], ", ", movement[1], ")?: ", celula.visitada)
-    #             print("torradeira 0?: ", celula.lerTorradeira())
-    #             if(celula.visitada and celula.lerTorradeira() == ' '):
-    #                 self.celulasTorradeira.remove(self.celulasTorradeira[i])
-    #                 break
-    #             elif(j == len(moves) - 1):
-    #                 i += 1
-
-    #             j += 1
-        
-    #     celulaPresente = self.tabuleiroExplorado[self.posicaoAtual[1]][self.posicaoAtual[0]]
-    #     if(celulaPresente.lerTorradeira() == 0):
-    #         self.celulasTorradeira = [(self.posicaoAtual[0], self.posicaoAtual[1])]
-    #         return
-
-        
-
-    #     if dist == ' ':
-    #         if (len(self.celulasTorradeira) > 1 and self.posicaoAtual in self.celulasTorradeira):
-    #             self.celulasTorradeira.remove(self.posicaoAtual)
-    #         return 
-
-        
-    #     x = self.posicaoAtual[0]
-    #     y = self.posicaoAtual[1]
-
-    #     newCelulasTorradeira = []
-
-    #     if x + 1 < 6 and self.tabuleiroExplorado[y][x + 1].lerManteiga() == 0:
-    #         newCelulasTorradeira.append((x + 1, y))
-    #     if x - 1 >= 0 and self.tabuleiroExplorado[y][x - 1].lerManteiga() == 0:
-    #         newCelulasTorradeira.append((x - 1, y))
-    #     if y + 1 < 6 and self.tabuleiroExplorado[y + 1][x].lerManteiga() == 0:
-    #         newCelulasTorradeira.append((x, y + 1))
-    #     if y - 1 >= 0 and self.tabuleiroExplorado[y - 1][x].lerManteiga() == 0:
-    #         newCelulasTorradeira.append((x, y - 1))
-
-
-    #     if self.celulasTorradeira != []:
-    #         self.celulasTorradeira = list(set(self.celulasTorradeira) & set(newCelulasTorradeira))
-    #         return
-            
-    #     self.celulasTorradeira = newCelulasTorradeira
-
     def atualizaCelulasTorradeira(self, dist):
+        """Atualiza as células com torradeira.
+        Args:
+        dist (int): A distância da torradeira em relação à posição atual.
+        """
+        
         around = {(0, 1), (0, -1), (1, 0), (-1, 0)}
         if dist == " ":
             for i in around:
@@ -284,8 +294,6 @@ class HomemTosta:
                 self.celulasTorradeira.remove(self.posicaoAtual)
 
             return
-            
-
         if dist == 1:
             i = 0
             while i < len(self.celulasTorradeira):
@@ -308,52 +316,92 @@ class HomemTosta:
 
             
     def mostraCelulasManteiga(self):
+        """Mostra as células com manteiga."""
         print(f"Células manteiga: \n{self.celulasManteiga}")
 
     def mostraCelulasTorradeira(self):
+        """Mostra as células com torradeira."""
         print(f"Células torradeira: \n{self.celulasTorradeira}")
 
     def espalhaManteiga(self, x_mant, y_mant):
+        """Espalha a manteiga no tabuleiro explorado.
+        Args:
+        x_mant (int): A posição x da manteiga.
+        y_mant (int): A posição y da manteiga.
+        """
         for i in range(6):
             for j in range(6):
                 self.tabuleiroExplorado[j][i].setManteiga(abs(x_mant - i) + abs(y_mant - j))
 
     def espalhaTorradeiraTabuleiroCompleto(self, x_torr, y_torr):
+        """
+        espalhaTorradeiraTabuleiroCompleto - Espalha a torradeira no tabuleiro explorado.
+        Args:
+        x_torr (int): A posição x da torradeira.
+        y_torr (int): A posição y da torradeira.
+        """
         for i in range(6):
             for j in range(6):
                 self.tabuleiroExplorado[j][i].setTorradeira(abs(x_torr - i) + abs(y_torr - j))
 
     
 class Celula:
-
+    """
+    Classe que representa uma célula no tabuleiro."""
     def __init__(self):
-        self.manteiga = 0
-        self.torradeira = ' '
-        self.barreiras = {"Norte": False, "Sul": False, "Este": False, "Oeste": False}
-        self.visitada = False
-
-    # def __init__(self, manteiga, torradeira):
-    #     self.manteiga = manteiga
-    #     self.torradeira = torradeira
-    #     self.barreiras = {"Norte": False, "Sul": False, "Este": False, "Oeste": False}
-
+        """
+        __init__ - Construtor da classe Celula.
+        """
+        self.manteiga = 0 #distância da manteiga
+        self.torradeira = ' ' #distância da torradeira
+        self.barreiras = {"Norte": False, "Sul": False, "Este": False, "Oeste": False} #barreiras
+        self.visitada = False #flag para verificar se a célula foi visitada
     def __str__(self):
+        """
+        __str__ - Representação da célula em forma de string.
+        Returns:
+        str: Uma string representando a célula.
+        """
         return f"(m: {self.manteiga}  t: {self.torradeira})\nBarreiras: {self.barreiras}"
     
     def lerManteiga(self):
+        """
+        lerManteiga - Lê a distância da manteiga.
+        Returns:
+        int: A distância da manteiga.
+        """
         return self.manteiga
     
     def lerTorradeira(self):
+        """
+        lerTorradeira - Lê a distância da torradeira.
+        Returns:
+        int: A distância da torradeira.
+        """
         return self.torradeira
     
     
     def setTorradeira(self, torradeira):
+        """
+        setTorradeira - Define a distância da torradeira.
+        Args:
+        torradeira (int): A distância da torradeira.
+        """
         self.torradeira = torradeira
     
     def setManteiga(self, manteiga):
+        """
+        setManteiga - Define a distância da manteiga.
+        Args:
+        manteiga (int): A distância da manteiga."""
         self.manteiga = manteiga
     
     def setBarreiras(self, barr_direcao):
+        """
+        setBarreiras - Define as barreiras.
+        Args:
+        barr_direcao (str): A direção da barreira.
+        """
         self.barreiras[barr_direcao] = True
 
 
@@ -361,11 +409,17 @@ class Celula:
         """
         Desenha uma célula na posição (x, y) com o tamanho especificado.
         Representa as distâncias e desenha as barreiras.
+        Args:
+        t (turtle.Turtle): O objeto turtle para desenhar.
+        x (int): A posição x da célula.
+        y (int): A posição y da célula.
+        tamanho (int): O tamanho da célula.
+        celula (Celula): A célula a desenhar.
         """
         # Mover para a posição inicial da célula
-        t.penup()
-        t.goto(x, y)
-        t.pendown()
+        t.penup() #não desenhar
+        t.goto(x, y) #mover para a posição x, y
+        t.pendown() #começar a desenhar
 
         # Desenhar as barreiras
         if celula.barreiras['Norte']:
@@ -406,24 +460,62 @@ class Celula:
 
 
 class Manteiga:
-
+    """
+    Classe que representa a manteiga no simulador.
+    """
     def __init__(self, x, y):
+        """
+        __init__ - Construtor da classe Manteiga.
+        Args:
+        x (int): A posição x da manteiga.
+        y (int): A posição y da manteiga.
+        """
         self.posicao = (x, y)
 
     def lerPosicao(self):
+        """
+        lerPosicao - Lê a posição da manteiga.
+        Returns:
+        tuple: Uma tuple representando a posição da manteiga.
+        """
         return self.posicao
 
     def setPosicao(self, x, y):
+        """
+        setPosicao - Define a posição da manteiga.
+        Args:
+        x (int): A posição x da manteiga.
+        y (int): A posição y da manteiga.
+        """
+
         self.posicao = (x, y)       
 
 class Torradeira:
-
+    """
+    Classe que representa a torradeira no simulador."""
     def __init__(self, x, y):
+        """
+        __init__ - Construtor da classe Torradeira.
+        Args:
+        x (int): A posição x da torradeira.
+        y (int): A posição y da torradeira.
+        """
         self.posicao = (x, y)
 
 
     def lerPosicao(self):
+        """
+        lerPosicao - Lê a posição da torradeira.
+        Returns:
+        tuple: Uma tuple representando a posição da torradeira.
+        """
         return self.posicao
 
     def setPosicao(self, x, y):
+        """
+        setPosicao - Define a posição da torradeira.
+        Args:
+        x (int): A posição x da torradeira.
+        y (int): A posição y da torradeira.
+        """
         self.posicao = (x, y) 

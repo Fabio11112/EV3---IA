@@ -9,18 +9,16 @@ from gyroscope import adjust_angle, robot, turn
 
 from pybricks.tools import wait
 
-#! Inicializa os motores
-# left_motor = Motor(Port.A)
-# right_motor = Motor(Port.B)
-
 forward = 560
 ev3 = EV3Brick()
 
 
-#robot = DriveBase(left_motor, right_motor, wheel_diameter=55.5, axle_track=150)
-
 #! Verifica se existe uma barreira a frente
 def avancar():
+    """Função que verifica se existe uma barreira a frente
+    e avança se não existir
+    Returns:
+        bool: True se não existir barreira, False se existe barreira"""
     barreira = detetaBarreira(ev3)
     if(not barreira):
         robotStraight(forward)
@@ -29,48 +27,66 @@ def avancar():
     return not barreira
 
 def robotStraight(distancia):
+    """Função que faz o robot andar para a frente ou para trás
+    Args:
+        distancia (int): Distancia que o robot vai andar, positiva para a frente e negativa para trás"""
     robot.straight(-distancia)
 
 def OneBlockForward(angle, gyro_sensor):
+    """Função que faz o robot andar uma casa para a frente
+    Args:
+        angle (int): Angulo que o robot tem de ajustar
+        gyro_sensor (GyroSensor): Sensor giroscópio
+    """
     adjust_angle(angle, gyro_sensor)
     robotStraight(forward)
-    #return avancar()
-    
+
 def OneBlocktoRight(angle, gyro_sensor):
+    """
+    Função que faz o robot andar uma casa para a direita
+    Args:
+        angle (int): Angulo que o robot tem de ajustar
+        gyro_sensor (GyroSensor): Sensor giroscópio
+    """
     turn(-90)
     adjust_angle(angle, gyro_sensor)
     robotStraight(forward)
-    #return avancar()
+
     
 def OneBlocktoLeft(angle, gyro_sensor):
+    """
+    Função que faz o robot andar uma casa para a esquerda
+    Args:
+        angle (int): Angulo que o robot tem de ajustar
+        gyro_sensor (GyroSensor): Sensor giroscópio
+    """
     turn(90)
     adjust_angle(angle, gyro_sensor)
     robotStraight(forward)
-    #return avancar()
+
 
 def OneBlockBehind(angle, gyro_sensor):
+    """
+    Função que faz o robot andar uma casa para trás
+    Args:
+        angle (int): Angulo que o robot tem de ajustar
+        gyro_sensor (GyroSensor): Sensor giroscópio
+    """
     turn(180)
     adjust_angle(angle, gyro_sensor)
     robotStraight(forward)
-    #return avancar()
     
-
-
-
 def test(ev3):
-    #! Avanca um metro e posteriormente volta atras
-    #robot.straight(1000)
-
+    """Função que testa os movimentos do robot
+    Args:
+        ev3 (EV3Brick): Instância do EV3Brick
+    """
     robotStraight(1000)
-
     ev3.speaker.beep()
-
     robotStraight(-1000)
     ev3.speaker.beep()
-
     #! Faz 360 graus e volta la posiçao inicial
     turn(360)
     ev3.speaker.beep()
-
     turn(-360)
     ev3.speaker.beep()

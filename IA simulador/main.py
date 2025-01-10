@@ -13,6 +13,7 @@ tabuleiro = [[Celula() for _ in range(6)] for _ in range(6)]
 
 
 def inicializaTabuleiro():
+    """inicializa o tabuleiro com as posições da manteiga, torradeira e barreiras"""
     x_mant, y_mant = 0, 0
     x_torr, y_torr = 0, 0
     n_barreiras = 0
@@ -98,6 +99,9 @@ def inicializaTabuleiro():
 def imprimir_tabuleiro(tablero):
     """
     Imprime el tablero de forma visual, por bloques, con distancias y barreras.
+    Args:
+        tablero (list): Tablero a imprimir.
+
     """
     filas = len(tablero)
     columnas = len(tablero[0])
@@ -133,7 +137,11 @@ def imprimir_tabuleiro(tablero):
     
 
 def espalhaTorradeira(x_torr, y_torr):
-
+    """espalha a torradeira pelas células adjacentes
+    Args:
+        x_torr (int): coordenada x da torradeira
+        y_torr (int): coordenada y da torradeira
+    """
     tabuleiro[y_torr][x_torr].setTorradeira(0)
 
     if(y_torr + 1 < 6):
@@ -150,6 +158,11 @@ def espalhaTorradeira(x_torr, y_torr):
 
 
 def espalhaManteiga(x_mant, y_mant):
+    """espalha a manteiga pelas células adjacentes
+    Args:
+        x_mant (int): coordenada x da manteiga
+        y_mant (int): coordenada y da manteiga
+    """
     for i in range(6):
         for j in range(6):
             tabuleiro[j][i].setManteiga(abs(x_mant - i) + abs(y_mant - j))
@@ -163,6 +176,12 @@ def espalhaTorradeiraTabuleiroCompleto(x_torr, y_torr):
 def desenha_tabuleiro(turtle, tela, tabuleiro, isTabuleiroVisitado=True, tamanho_celula=50):
     """
     Desenha o tabuleiro completo.
+    Args:
+        turtle (Turtle): Objeto Turtle para desenhar.
+        tela (Screen): Objeto Screen para atualizar a tela.
+        tabuleiro (list): Tabuleiro a desenhar.
+        isTabuleiroVisitado (bool): Se o tabuleiro a desenhar é o visitado ou não.
+        tamanho_celula (int): Tamanho da célula a desenhar.
     """
     # Configuração inicial do Turtle
     
@@ -189,17 +208,20 @@ def desenha_tabuleiro(turtle, tela, tabuleiro, isTabuleiroVisitado=True, tamanho
 
 
 def main():
+    """Função principal do programa."""
     torradeiraEspalhada, manteigaEspalhada = False, False
 
-
+    # Configuração inicial do Turtle
     t = turtle.Turtle()
     t.speed(0)
     t.hideturtle()
     tela = turtle.Screen()
     tela.tracer(0)
 
+    # Inicializa o HomemTosta
     hm = HomemTosta(t)
 
+    # Inicializa o tabuleiro
     inicializaTabuleiro()
     #desenha_tabuleiro(t, tela, tabuleiro, False)
 
@@ -215,38 +237,36 @@ def main():
         hm.lerCelula(celulaPresente)
         
         if(inicializada):
-            #manteiga no início da análise ainda sem descobrir
+            # manteiga no início da análise ainda sem descobrir
             if(not hm.manteigaDescoberta()):
                 numberButterBeforeUpdating = len(hm.celulasManteiga)
 
                 hm.atualizaCelulasManteiga(celulaPresente.lerManteiga())
                 hm.mostraCelulasManteiga()
 
-                #caso em que a torradeira já foi descoberta e se minimizam as células candidatas a ter a manteiga
-                #é necessário atualizar a árvore de pesquisa
+                # caso em que a torradeira já foi descoberta e se minimizam as células candidatas a ter a manteiga
+                # é necessário atualizar a árvore de pesquisa
                 if(hm.torradeiraDescoberta() and numberButterBeforeUpdating != 0 and numberButterBeforeUpdating > len(hm.celulasManteiga)):
                     hm.resolverTorradeira = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasTorradeira[0], hm.posicaoBolor, True, hm.celulasManteiga)
                     hm.decideToResolve()
 
-                #caso em que nesta iteração da análise foi, de facto, encontrada a localização da manteiga
+                # caso em que nesta iteração da análise foi, de facto, encontrada a localização da manteiga
                 if(hm.manteigaDescoberta()):
                     celula = hm.celulasManteiga[0]
                     hm.espalhaManteiga(celula[0], celula[1])
 
-                    #faz a busca da manteiga
+                    # faz a busca da manteiga
                     hm.resolverManteiga = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0], hm.posicaoBolor)
                     hm.decideToResolve()
 
-                    #atualizar busca da torradeira se esta já tinha sido descoberta
+                    # atualizar busca da torradeira se esta já tinha sido descoberta
                     if(hm.torradeiraDescoberta()):
                         hm.resolverTorradeira = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasTorradeira[0], hm.posicaoBolor, True, hm.celulasManteiga)
                         hm.decideToResolve()
 
-
-
-            #caso em que a manteiga já foi descoberta
+            # caso em que a manteiga já foi descoberta
             else:
-                #e que uma nova barreira haja sido descoberta, é necessário atualizar a árvore de pesquisa
+                # e que uma nova barreira haja sido descoberta, é necessário atualizar a árvore de pesquisa
                 if(True in celulaPresente.barreiras.values()):
                     hm.resolverManteiga = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0], hm.posicaoBolor)
                     hm.decideToResolve()
@@ -255,32 +275,30 @@ def main():
                     hm.resolverManteiga = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasManteiga[0], hm.posicaoBolor)
                     hm.decideToResolve()
 
-
-            #torradeira no início da análise ainda sem descobrir
+            # torradeira no início da análise ainda sem descobrir
             if(not hm.torradeiraDescoberta()):
                 hm.atualizaCelulasTorradeira(celulaPresente.lerTorradeira())
                 hm.mostraCelulasTorradeira()
 
-                #caso em que nesta iteração da análise seja descoberta a torradeira
+                # caso em que nesta iteração da análise seja descoberta a torradeira
                 if(hm.torradeiraDescoberta()):
                     celula = hm.celulasTorradeira[0]
                     hm.espalhaTorradeiraTabuleiroCompleto(celula[0], celula[1])
                     hm.resolverTorradeira = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasTorradeira[0], hm.posicaoBolor, True, hm.celulasManteiga)
                     hm.decideToResolve()
-            #torradeira já tinha sido encontrada
+            # torradeira já tinha sido encontrada
             else:
-                #e que uma nova barreira haja sido descoberta, é necessário atualizar a árvore de pesquisa
+                # e que uma nova barreira haja sido descoberta, é necessário atualizar a árvore de pesquisa
                 if(True in celulaPresente.barreiras.values() and not celulaPresente.visitada):
                     hm.resolverTorradeira = a_star_search(hm.tabuleiroExplorado, hm.posicaoAtual, hm.celulasTorradeira[0], hm.posicaoBolor, True, hm.celulasManteiga)
                     hm.decideToResolve()
 
-        else:  #not inicializada
+        else:  # not inicializada
             hm.inicializaCelulasManteiga(celulaPresente.lerManteiga())
             hm.mostraCelulasManteiga()
             inicializada = True
 
-
-
+        # Verifica condições de vitória ou derrota
         if hm.isGanhou(): 
             print("HT chegou à Manteiga")
             break
@@ -298,13 +316,15 @@ def main():
 
         #desenha_tabuleiro(t, tela, tabuleiro, False)
 
-        #print(hm.posicaoAtual)
+        # Espera pelo usuário para continuar
         wait = input("Pressione Enter para continuar...")
 
         t.reset()
 
+        # Move o HomemTosta
         hm.mover(i)
 
+        # Move o bolor
         if(HmisInTorradeira(hm)):
             hm.moverBolor(i)
             hm.moverBolor(i)
@@ -317,6 +337,9 @@ def main():
 
 
 def HmisInTorradeira(hm):
+    """Verifica se o HomemTosta está na torradeira
+    Args:
+        hm (HomemTosta): HomemTosta a verificar"""
     x = hm.posicaoAtual[0]
     y = hm.posicaoAtual[1]
 
@@ -326,6 +349,9 @@ def HmisInTorradeira(hm):
     return False
 
 def bolorSeQueimou(hm):
+    """Verifica se o bolor se queimou
+    Args:
+        hm (HomemTosta): HomemTosta a verificar"""
     x = hm.posicaoBolor[0]
     y = hm.posicaoBolor[1]
 
@@ -335,6 +361,9 @@ def bolorSeQueimou(hm):
     return False
 
 def bolorChegouManteiga(hm):
+    """Verifica se o bolor chegou à manteiga
+    Args:
+        hm (HomemTosta): HomemTosta a verificar"""
     x = hm.posicaoBolor[0]
     y = hm.posicaoBolor[1]
 

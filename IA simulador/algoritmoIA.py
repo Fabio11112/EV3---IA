@@ -4,22 +4,35 @@ import heapq
 COL = ROW = 6
 numberStates = 0
 
+
 class Cell:
     def __init__(self):
-        self.pai = None
+        """
+        __init__ - Construtor da classe Cell
+        """
+        self.pai = None #posição do pai
         #f = g + h
-        self.f = float('inf')
+        self.f = float('inf') #custo total
         #custo total
-        self.g = float('inf')
+        self.g = float('inf') #custo de movimento
         #heuristica
-        self.h = float('inf')
+        self.h = float('inf') #custo de movimento
 
 def is_valid(row, col, manteigaCells, bvm):
-    isValid = (row >= 0) and (row < ROW) and (col >= 0) and (col < COL)
+    """
+    is_valid verifica se a posição é válida
 
+    :param row: linha
+    :param col: coluna
+    :param manteigaCells: lista de posições da manteiga
+    :param bvm: posição do bolor
+    :return: se é válida ou não
+    """
+    isValid = (row >= 0) and (row < ROW) and (col >= 0) and (col < COL)
     homemTostaLost = (row == bvm[0] and col == bvm[1])
 
     if(len(manteigaCells) == 1):
+        
         manteiga = manteigaCells[0]
         #se chegou à manteiga antes do que o BVM, ganhou, casó contrário, ou seja, ele não caiu na manteiga na mesma jogada
         #tudo depende de se ele caiu no BVM ou de se o BVM irá cair no Homem Tosta
@@ -29,15 +42,24 @@ def is_valid(row, col, manteigaCells, bvm):
     return isValid and not homemTostaLost
 
 
-"Uma célula é não bloqueada quando não tem barreiras na direção que se deseja ir OU não esteja o bolor na posição na que se quer ir"	
+"""Uma célula é não bloqueada quando não tem barreiras na direção que se deseja ir OU não esteja o bolor na posição na que se quer ir"""	
 def is_unblocked(grid, x_before, y_before, x_next, y_next, x_bolor, y_bolor): 
+    """
+    is_unblocked verifica se a célula é bloqueada
+
+    :param grid: grid
+    :param x_before: coluna anterior
+    :param y_before: linha anterior
+    :param x_next: próxima coluna
+    :param y_next: próxima linha
+    :param x_bolor: coluna do bolor
+    :param y_bolor: linha do bolor
+    :return: se é bloqueada ou não
+    """
     cell_before = grid[y_before][x_before]
 
     x_difference = x_before - x_next
     y_difference = y_before - y_next
-
-    # if(x_next == x_bolor and y_next == y_bolor):
-    #     return False
 
     if(x_difference < 0 and cell_before.barreiras['Este']):
         return False
@@ -51,25 +73,42 @@ def is_unblocked(grid, x_before, y_before, x_next, y_next, x_bolor, y_bolor):
     return True
 
 def is_destination(x, y, dest, isKillingBvm = False, bvm = None):
+    """
+    is_destination verifica se a posição é o destino
+
+    :param x: coluna
+    :param y: linha
+    :param dest: destino
+    :param isKillingBvm: se está matando o BVM
+    :param bvm: posição do bolor
+    :return: se é o destino ou não
+    """
     if(isKillingBvm):
         return bvm[0] == dest[0] and bvm[1] == dest[1]
     return x == dest[0] and y == dest[1]
 
 
-"Método que retorna a heurística da busca A* e também a seguinte posição do bolor de acordo com a posição atual"
+"""Método que retorna a heurística da busca A* e também a seguinte posição do bolor de acordo com a posição atual"""
 def calculate_h_value(x, y, x_bolor, y_bolor, dest, celula):
+    """
+    calculate_h_value calcula a heurística
+
+    :param x: coluna
+    :param y: linha
+    :param x_bolor: coluna do bolor
+    :param y_bolor: linha do bolor
+    :param dest: destino
+    :param celula: célula
+    :return: heurística e a próxima posição do bolor
+    """
     h_butter = abs(x - dest[0]) + abs(y - dest[1])
     butter_pos = dest
     penalty_bvm = 0
     penalty_bvm_butter = 0
-    #visited_penalty = 0
 
     bvm_next_x, bvm_next_y = calculate_BVM_next_position(x, y, x_bolor, y_bolor)
-
-    # if(celula.visitada):
-    #     visited_penalty = 10
-    
     distance_to_bvm = abs(x - bvm_next_x) + abs(y - bvm_next_y)
+
     if distance_to_bvm == 0:
         penalty_bvm += 1000  # Direct collision
     elif distance_to_bvm == 1:
@@ -83,12 +122,21 @@ def calculate_h_value(x, y, x_bolor, y_bolor, dest, celula):
     elif distance_bvm_butter == 1:
         penalty_bvm_butter += 50  # BVM adjacent to Butter
 
-    #print(f"h_butter: {h_butter}, \npenalty_bvm: {penalty_bvm}, \npenalty_bvm_butter: {penalty_bvm_butter}")
-
     return (h_butter + penalty_bvm + penalty_bvm_butter, (bvm_next_x, bvm_next_y))
 
 def calculate_h_value_torradeira(x, y, x_bolor, y_bolor, manteiga, dest, celula):
-    #h_butter = abs(x - manteiga[0]) + abs(y - manteiga[1])
+    """
+    calculate_h_value_torradeira calcula a heurística
+
+    :param x: coluna
+    :param y: linha
+    :param x_bolor: coluna do bolor
+    :param y_bolor: linha do bolor
+    :param manteiga: lista de posições da manteiga
+    :param dest: destino
+    :param celula: célula
+    :return: heurística e a próxima posição do bolor
+    """
     toaster_pos = dest
     penalty_bvm = 0
     penalty_bvm_butter = 0
@@ -118,18 +166,19 @@ def calculate_h_value_torradeira(x, y, x_bolor, y_bolor, manteiga, dest, celula)
 
     penalty_bvm_butter /= len(manteiga)
     
-    # if distance_bvm_butter == 0:
-    #     penalty_bvm_butter += 1000  # BVM on Butter (critical)
-    # elif distance_bvm_butter == 1:
-    #     penalty_bvm_butter += 50  # BVM adjacent to Butter
-
-    #print(f"h_toaster: {h_toaster}, penalty_bvm: {penalty_bvm}, penalty_bvm_butter: {penalty_bvm_butter}")
-    
-
     return (h_toaster + penalty_bvm + penalty_bvm_butter, (bvm_next_x, bvm_next_y))
 
 
 def calculate_BVM_next_position(x, y, x_bolor, y_bolor):
+    """
+    calculate_BVM_next_position calcula a próxima posição do bolor
+
+    :param x: coluna
+    :param y: linha
+    :param x_bolor: coluna do bolor
+    :param y_bolor: linha do bolor
+    :return: próxima posição do bolor
+    """
     if(y < y_bolor):
         return x_bolor, y_bolor-1
     elif(y > y_bolor):
@@ -144,7 +193,14 @@ def calculate_BVM_next_position(x, y, x_bolor, y_bolor):
 
 
 def trace_path(cell_details, dest, isKillingBvm = False):
-    
+    """
+    trace_path traça o caminho
+
+    :param cell_details: detalhes da célula
+    :param dest: destino
+    :param isKillingBvm: se está matando o BVM
+    :return: caminho
+    """
     text = "BVM" if isKillingBvm else "Manteiga"
 
     print("Caminho: " + text + "\n")
@@ -154,7 +210,6 @@ def trace_path(cell_details, dest, isKillingBvm = False):
     i = 0
 
     while cell_details[currentState].pai != None:
-        #input(f"Clique enter para continuar")
         print(i)
         print(currentState)
         path.append([currentState[0], currentState[1]])
@@ -172,6 +227,17 @@ def trace_path(cell_details, dest, isKillingBvm = False):
 
 
 def a_star_search(tabuleiro, inicio, destino, bolor_position, isKillingBvm = False, posicoesManteiga = None):
+    """
+    a_star_search busca A* - algoritmo de busca
+
+    :param tabuleiro: tabuleiro
+    :param inicio: início
+    :param destino: destino
+    :param bolor_position: posição do bolor
+    :param isKillingBvm: se está matando o BVM
+    :param posicoesManteiga: posições da manteiga
+    :return: caminho
+    """
     global numberStates
 
     manteigaCells = posicoesManteiga if posicoesManteiga is not None else [destino]
@@ -179,10 +245,6 @@ def a_star_search(tabuleiro, inicio, destino, bolor_position, isKillingBvm = Fal
     if not is_valid(inicio[0], inicio[1], manteigaCells, bolor_position) or not is_valid(destino[0], destino[1], manteigaCells, bolor_position):
         print("Inicio ou destino inválido")
         return []
-
-    # if not is_unblocked(tabuleiro, tabuleiro[inicio[0]][inicio[1]], inicio[0], inicio[1], inicio[0], inicio[1]):
-    #     print("Inicio ou destino é bloqueado")
-    #     return
     if isKillingBvm: 
         if is_destination(inicio[0], inicio[1], destino, isKillingBvm, bolor_position):
             print("Já bolor se queimou")
@@ -193,8 +255,6 @@ def a_star_search(tabuleiro, inicio, destino, bolor_position, isKillingBvm = Fal
             return []
 
     closed_list_states = {}
-
-    #cell_details = [[Cell() for _ in range(COL)] for _ in range(ROW)]
     cell_details = {}
 
     x = inicio[0]
@@ -220,7 +280,6 @@ def a_star_search(tabuleiro, inicio, destino, bolor_position, isKillingBvm = Fal
     found_dest = False
 
     while len(open_list) > 0:
-        #print(len(open_list))
         p = heapq.heappop(open_list)
 
         x = p[1]
@@ -247,7 +306,6 @@ def a_star_search(tabuleiro, inicio, destino, bolor_position, isKillingBvm = Fal
 
 
                 if is_valid(x_next, y_next, manteigaCells, (x_bolor_next, y_bolor_next)) and is_unblocked(tabuleiro, x, y, x_next, y_next, x_bolor, y_bolor) and lastState not in closed_list_states:
-                    # if (isKillingBvm and is_destination(x_next, y_next, destino, isKillingBvm, (x_bolor, y_bolor))) or is_destination(x_next, y_next, destino):
                     if is_destination(x_next, y_next, destino, isKillingBvm, (x_bolor_next, y_bolor_next)):
                         
                         cell_details[lastState] = Cell()
@@ -288,9 +346,3 @@ def a_star_search(tabuleiro, inicio, destino, bolor_position, isKillingBvm = Fal
         print("Destino não encontrado")
 
         return []
-
-
-    
-
-
-

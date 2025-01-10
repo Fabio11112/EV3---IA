@@ -27,120 +27,65 @@ SEGUNDOS = 5000
 
 
 def HmisInTorradeira(hm):
+    """
+    Função que verifica se o Homem Tosta está numa torradeira
+    Args:
+        hm (HomemTosta): Homem Tosta
+    Returns:
+        bool: True se está numa torradeira, False caso contrário"""
     x = hm.coordinates[0]
     y = hm.coordinates[1]
-
     print("Coordenadas HT: ", (x, y))
     print("Valor torradeira lerTorradeir(): ", hm_t.tabuleiroExplorado[y][x].lerTorradeira())
     print("Valor torradeira torradeira: ", hm_t.tabuleiroExplorado[y][x].torradeira)
     print("Está na torradeira?: ", hm_t.tabuleiroExplorado[y][x].lerTorradeira() == 0)
-
     if(hm_t.tabuleiroExplorado[y][x].lerTorradeira() == 0):
         print("Caíste na Torradeira!")
         return True
     return False
 
 def bolorSeQueimou(hm):
-
+    """
+    Função que verifica se o bolor se queimou
+    Args:
+        hm (HomemTosta): Homem Tosta
+    Returns:
+        bool: True se o bolor se queimou, False caso contrário"""
     if len(hm.celulasTorradeira) == 1:
         x = hm.bolor[0]
         y = hm.bolor[1]
-
         if (hm_t.tabuleiroExplorado[y][x].lerTorradeira() == 0):
             print("O Bolor se queimou")
             return True
         return False
 
 def bolorChegouManteiga(hm):
+    """
+    Função que verifica se o bolor chegou à manteiga
+    Args:
+        hm (HomemTosta): Homem Tosta
+    Returns:
+        bool: True se o bolor chegou à manteiga, False caso contrário"""
     if(len(hm.celulasManteiga) == 1):
         x = hm.bolor[0]
         y = hm.bolor[1]
-
         mant_x = hm.celulasManteiga[0][0]
         mant_y = hm.celulasManteiga[0][1]
-
         if(x == mant_x and y == mant_y):
             return True
-        
         return False
-
     return False #caso de incerteza
 
-
-def main1():
-    estava_em_torradeira = False
-    pre_configuracao_cores()
-
-    print("está no ciclo\n")
-    while True:
-
-        wait_for_button()
-
-        cor = detectar_cor()
-        rgb = cor[0]
-        ev3.screen.print("Começa leitura")
-        print("Começa leitura")
-        dadosCelula = hm_t.analisaCelula()
-        ev3.screen.print("Acaba leitura")
-        print("Acaba leitura")
-
-
-        print(dadosCelula)
-
-        if(hm_t.coordinates == hm_t.bolor):
-            ev3.screen.print("Game Over")
-            print("Game Over")
-            tocar_musica_derrota()
-            break
-        elif(dadosCelula["dados"]['manteiga'] == 0):
-            ev3.screen.print("Victory")
-            print("Victory")
-            tocar_musica_vitoria()
-            break
-        elif(dadosCelula["dados"]["torradeira"] == 0):
-            if(not estava_em_torradeira):
-                estava_em_torradeira = True
-                continue
-            else:
-                estava_em_torradeira = False
-
-
-
-        hm_t.move(dadosCelula["barreira"])
-        if(hm_t.morto):
-            print("Game Over")
-            
-            ev3.screen.print("Game Over")
-            break
-
-
-        imprime_tabuleiro()
-        print("Posicao bolor: ", hm_t.bolor)
-        hm_t.calculaNovaPosicaoBolor()
-        print("Nova posicao bolor: ", hm_t.bolor)
-
-        print("(Coordenadas, Direção):", (hm_t.getCoordinates(),
-            hm_t.getDirection())) 
-
-
 def main():
-    torradeiraEspalhada, manteigaEspalhada = False, False
+    """
+    Função principal que executa o jogo"""
     hmWasInToaster = False
-
-    i = 0
-
-    #hm_t.analisaCelula()
-    #calculoDeBusca(hm_t)
-    #ganhar_ou_perder = verificarPerderGanhar(hm_t)
-
     while True:
-        #if ganhar_ou_perder != 0:
-            #break~
         celulaPresente = hm_t.tabuleiroExplorado[hm_t.coordinates[1]][hm_t.coordinates[0]]
         if(not celulaPresente.visitada):
             hm_t.analisaCelula()
-        #calculoDeBusca(hm_t, hmWasInToaster)
-
+        if verificarPerderGanhar(hm_t):
+            break
         hmIsInToaster = HmisInTorradeira(hm_t)
         print("ANTES DE SE MOVER:")
         print("HT: ", hm_t.coordinates)
@@ -149,54 +94,37 @@ def main():
         print("Posições Torradeira: ", hm_t.celulasTorradeira)
         print("Árvore manteiga: ", hm_t.resolverManteiga)
         print("Árvore torradeira: ", hm_t.resolverTorradeira)
-
         if(not hmIsInToaster or hmWasInToaster):
-            #!!!!!!!!!!!!!!!!!!!!!!!!
             calculoDeBusca(hm_t, hmWasInToaster)
             hm_t.move()
             hm_t.moverBolor()
             hmWasInToaster = False
-
         else:
             hm_t.moverBolor()
             batman_melody() 
             hmWasInToaster = True
-
-    
         print("DEPOIS DE SE MOVER:")
         print("HT: ", hm_t.coordinates)
         print("BVM: ", hm_t.bolor)
         print("Posições Manteiga: ", hm_t.celulasManteiga)
         print("Posições Torradeira: ", hm_t.celulasTorradeira)
         print("Árvore manteiga: ", hm_t.resolverManteiga)
-        print("Árvore torradeira: ", hm_t.resolverTorradeira)
-
-        # if(HmisInTorradeira(hm_t)):
-        #     batman_melody()
-        #     hm_t.moverBolor()
-        #     hm_t.moverBolor()
-        # else:
-        #     hm_t.moverBolor()
-
-
-#!------------------------------
-#!------------------------------        
+        print("Árvore torradeira: ", hm_t.resolverTorradeira)     
         wait_for_button()
-
         print("Buscar manteiga: ", hm_t.isResolvingButter)
         print("Buscar torradeira: ", hm_t.isResolvingToaster)
-
         if verificarPerderGanhar(hm_t):
             break
-
-
-#!------------------------------ 
-        #wait_for_button()
-#!------------------------------
-
-
-
 def calculoDeBusca(hm_t, hmWasInToaster):
+    """
+    Calcula a busca a ser realizada pelo Homem Tosta
+    Args:
+        hm_t (HomemTosta): Homem Tosta
+        hmWasInToaster (bool): True se o Homem Tosta estava numa torradeira, False caso
+        contrário
+    Returns:
+        None
+    """
     global inicializada
     celulaPresente = hm_t.tabuleiroExplorado[hm_t.coordinates[1]][hm_t.coordinates[0]]
     if inicializada:
@@ -219,13 +147,11 @@ def calculoDeBusca(hm_t, hmWasInToaster):
                 if(hm_t.torradeiraDescoberta()):
                     hm_t.resolverTorradeira = a_star_search(hm_t.tabuleiroExplorado, hm_t.coordinates, hm_t.celulasTorradeira[0], hm_t.bolor, True, hm_t.celulasManteiga)
                     hm_t.decideToResolve()
-    
         else:
             if(True in celulaPresente.barreiras.values()):
                 hm_t.resolverManteiga = a_star_search(hm_t.tabuleiroExplorado, hm_t.coordinates, hm_t.celulasManteiga[0], hm_t.bolor)
                 hm_t.decideToResolve()
 
-            #!!!!!!!!!!!!!!!!!
             elif(hmWasInToaster):
                 hm_t.resolverManteiga = a_star_search(hm_t.tabuleiroExplorado, hm_t.coordinates, hm_t.celulasManteiga[0], hm_t.bolor)
                 hm_t.decideToResolve()
@@ -239,22 +165,24 @@ def calculoDeBusca(hm_t, hmWasInToaster):
                 hm_t.espalhaTorradeiraTabuleiroCompleto(celula[0], celula[1])
                 hm_t.resolverTorradeira = a_star_search(hm_t.tabuleiroExplorado, hm_t.coordinates, hm_t.celulasTorradeira[0], hm_t.bolor, True, hm_t.celulasManteiga)
                 hm_t.decideToResolve()
-
         else:
             #e que uma nova barreira haja sido descoberta, é necessário atualizar a árvore de pesquisa
             if(True in celulaPresente.barreiras.values() and not celulaPresente.visitada):
                 hm_t.resolverTorradeira = a_star_search(hm_t.tabuleiroExplorado, hm_t.coordinates, hm_t.celulasTorradeira[0], hm_t.bolor, True, hm_t.celulasManteiga)
                 hm_t.decideToResolve()
-
-
-
-
     else:  
         hm_t.inicializaCelulasManteiga(celulaPresente.lerManteiga())
         hm_t.mostraCelulasManteiga()
         inicializada = True
 
 def verificarPerderGanhar(hm_t):
+    """
+    Verifica se o Homem Tosta ganhou ou perdeu
+    Args:
+        hm_t (HomemTosta): Homem Tosta
+    Returns:
+        bool: True se o Homem Tosta ganhou ou perdeu, False caso contrário
+    """
     if hm_t.isGanhou(): 
         print("HT chegou à Manteiga")
         tocar_musica_vitoria()
@@ -271,20 +199,24 @@ def verificarPerderGanhar(hm_t):
         print("O Bolor se queimou")
         tocar_musica_vitoria()
         return True
-
     return False
-    
 
-#sensorUltrasonic(ev3)
 def wait_for_button():
+    """
+    Espera que o botão central seja pressionado
+    Args:
+        None
+    Returns:
+        None
+    """
     while True:
         buttons = ev3.buttons.pressed()
         if Button.CENTER in buttons:
             break
         wait(100)
 
+#Função principal
 main()
 
-
-
+#Este método é utilizado para guardar as configurações das cores do sensor de cor
 #guardar_configuracao_cores()  #azul -> vermelho -> preto -> branco

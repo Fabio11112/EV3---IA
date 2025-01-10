@@ -9,18 +9,26 @@ JSON_file = "cores.json"
 ev3 = EV3Brick()
 
 sensor_de_cor = ColorSensor(Port.S2)
-# 0 = Sem cor, 1 = Preto, 2 = Azul, 3 = Verde, 4 = Amarelo, 5 = Vermelho, 6 = Branco, 7 = Castanho2
+
 def detectar_cor():
-    #cor_detectada_rgb = sensor_de_cor.color()  # Ler a cor detectada
+    """método que deteta a cor do sensor de cor
+
+    Returns:
+        tuplo: retorna a cor detectada e o nome da cor
+    """
     cor_detectada = sensor_de_cor.rgb()
     cor_nome = sensor_de_cor.color()
     # Também é possível ler a intensidade da luz refletida
     intensidade_luz_refletida = sensor_de_cor.reflection()
-    
     return (cor_detectada, cor_nome)
 
-
 def pre_configuracao():
+    """método que faz a leitura de 4 cores distintas, azul, vermelho, preto e branco, e as retorna
+    num dicionário para futura configuração
+
+    Returns:
+        Dicionário: dicionário com os valores rgb de cada cor guardada
+    """
     azul = sensor_de_cor.rgb()
     print("azul: ", azul)
     ev3.speaker.beep(400,200)
@@ -36,11 +44,11 @@ def pre_configuracao():
     branco = sensor_de_cor.rgb()
     print("branco: ", branco)
     ev3.speaker.beep(400,200)
-
     return {"Azul":azul, "Vermelho":vermelho, "Preto":preto, "Branco":branco}
 
 def guardar_configuracao_cores():
+    """método que guarada a configuração das cores num ficheiro JSON
+    """
     cores = pre_configuracao()
-    #cores = {"Azul": (0, 0, 0), "Vermelho": (0, 0, 0), "Preto": (0, 0, 0), "Branco": (0, 0, 0)}
     with open(JSON_file, 'w') as f:
         json.dump(cores, f, indent=4)
