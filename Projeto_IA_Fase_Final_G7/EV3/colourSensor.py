@@ -12,6 +12,7 @@ sensor_de_cor = ColorSensor(Port.S2)
 
 def detectar_cor():
     """método que deteta a cor do sensor de cor
+
     Returns:
         tuplo: retorna a cor detectada e o nome da cor
     """
